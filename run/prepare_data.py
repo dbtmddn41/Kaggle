@@ -45,13 +45,16 @@ def preprocess_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame,
         curr_series = series.query('series_id == @id').reset_index().sort_values(by='step')
         for i in range(len(curr_events)-1):
             start, end = max(0, curr_events.iloc[i].step-cfg.duration), min(curr_events.iloc[i].step+cfg.duration, len(curr_series))
-            series_data = curr_series.loc[start: end, cfg.features]
+            series_data = curr_series.loc[start: end-1, cfg.features]
+            if len(series_data) != cfg.duration * 2:
+                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration * 2 - len(series_data)), columns=cfg.features)
+                series_data = pd.concat([series_data, padding_df], ignore_index=True)
             event_target = curr_events.query('@start < step and step < @end')
             onsets = event_target.query('event == 1').step.values.astype(np.uint32)
             wakeups = event_target.query('event == 2').step.values.astype(np.uint32)
             data.append(series_data)
             target.append((onsets, wakeups))
-        if series_idx != 0 and (series_idx % 5 == 0 or series_idx == len(series_ids)-1):
+        if series_idx != 0 and (series_idx % 50 == 0 or series_idx == len(series_ids)-1):
             convert_and_save(cfg, data, target, (series_idx-1)//50)
             data = []
             target = []

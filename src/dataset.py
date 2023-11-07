@@ -13,7 +13,7 @@ def get_dataset(cfg: DictConfig) -> None:
     # features = cfg.features
     features = ['enmo', 'anglez']
 
-    filenames = tf.io.gfile.glob('/home/lyu/AI/CMI/data/preprocessed_data/'+"*0.tfrec")
+    filenames = tf.io.gfile.glob('/home/lyu/AI/CMI/data/preprocessed_data/'+"*1.tfrec")
     print(filenames)
     AUTOTUNE = tf.data.AUTOTUNE
     dataset = (
@@ -32,9 +32,12 @@ def parse_tfrecord_fn(example):
         "wakeup": tf.io.VarLenFeature(tf.int64)
     }
     for feats in features:
-        feature_description[feats] = tf.io.FixedLenFeature([], tf.float32)
+        feature_description[feats] = tf.io.VarLenFeature(tf.float32)
     example = tf.io.parse_single_example(example, feature_description)
-    # example["onset"] = tf.sparse.to_dense(example["onset"])
+    example["onset"] = tf.sparse.to_dense(example["onset"])
+    example["wakeup"] = tf.sparse.to_dense(example["wakeup"])
+    for feats in features:
+        example[feats] = tf.sparse.to_dense(example[feats])
     return example
 
     
