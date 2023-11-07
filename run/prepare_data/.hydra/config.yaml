@@ -1,0 +1,9 @@
+phase: train
+duration: null
+features: 5760 - "anglez" - "enmo"
+dir:
+  data_dir: /home/lyu/AI/CMI/child-mind-institute-detect-sleep-states
+  processed_dir: null
+  output_dir: null
+  model_dir: null
+  sub_dir: ./
