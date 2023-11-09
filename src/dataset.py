@@ -27,12 +27,14 @@ def get_dataset(cfg: DictConfig, mode='train') -> None:
     def make_dataset(mode, example):
         if mode == 'train':
             seq_len = cfg.duration * 2
-            start = rng.make_seeds(1)[0] % cfg.duration
+            start = rng.make_seeds(1)[0] % (seq_len - cfg.duration)
             start = tf.squeeze(start)
             end = start + cfg.duration
             for feats in cfg.features:
                 if example[feats].shape[0] == seq_len:
                     example[feats] = tf.slice(example[feats], start, end)
+            for label_name in ('onset', 'wakeup'):
+                example[label_name] = tf.boolean_mask(example[label_name], (start <= example[label_name]) & (example[label_name] < end))
         elif mode == 'validation':
             seq_len, start = cfg.duration, 0
             end = seq_len
@@ -40,7 +42,7 @@ def get_dataset(cfg: DictConfig, mode='train') -> None:
         feature = {}
         for feats in cfg.features:
             feature[feats] = example[feats]
-        label = get_label(example, seq_len, start)
+        label = get_label(example, seq_len//2, start)
         if mode == 'train':
             label = gaussian_label(
                 label, offset=cfg.label.offset, sigma=cfg.label.sigma
@@ -55,17 +57,18 @@ def get_dataset(cfg: DictConfig, mode='train') -> None:
     dataset = (
     tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTOTUNE)
     .map(parse_tfrecord_fn , num_parallel_calls=AUTOTUNE)
-    # .map(partial(make_dataset, mode), num_parallel_calls=AUTOTUNE)
+    .map(partial(make_dataset, mode), num_parallel_calls=AUTOTUNE)
     # .shuffle(cfg.batch_size * 10)
     # .batch(1)
     # .prefetch(AUTOTUNE)
     )
     return dataset
 
-def get_label(example, seq_len: int, start: int):
-    onset_label= tf.zeros((seq_len,))
-    wakeup_label = tf.zeros((seq_len,))
-    awake_label = tf.fill((seq_len,), -1.)
+def get_label(example, label_len: int, start: int):
+    onset_label= tf.zeros((label_len,))
+    wakeup_label = tf.zeros((label_len,))
+    awake_label = tf.fill((label_len,), -1.)
+    start = tf.squeeze(start)
     onset_label = tf.tensor_scatter_nd_update(onset_label, example['onset'][:, tf.newaxis]-start, tf.cast(tf.ones_like(example['onset']), tf.float32))
     awake_label = tf.tensor_scatter_nd_update(awake_label, example['onset'][:, tf.newaxis]-start-1, tf.cast(tf.zeros_like(example['onset']), tf.float32))
     wakeup_label = tf.tensor_scatter_nd_update(wakeup_label, example['wakeup'][:, tf.newaxis]-start, tf.cast(tf.ones_like(example['wakeup']), tf.float32))
@@ -78,6 +81,9 @@ def get_label(example, seq_len: int, start: int):
         awake_label = tf.tensor_scatter_nd_update(awake_label, indices, updates)
     indices = tf.range(mask[-1]+1, tf.shape(awake_label)[0])[:, tf.newaxis]
     updates = tf.repeat(tf.cast(tf.logical_not(tf.cast(awake_label[mask[-1]], tf.bool)), tf.float32), tf.shape(indices)[0])
+    #라벨이 하나도 없으면 그냥 깨어있는걸로
+    if tf.shape(mask)[0] == 1:
+        updates = tf.repeat(1., tf.shape(indices)[0])
     awake_label = tf.tensor_scatter_nd_update(awake_label, indices, updates)
     return tf.stack([onset_label, wakeup_label, awake_label], axis=1)
 
@@ -88,7 +94,8 @@ def gaussian_label(label: tf.Tensor, offset: int, sigma: int) -> tf.Tensor:
     gaussian_kernel = rv.pdf(x)
     gaussian = tf_convolve(label[:, :num_events], gaussian_kernel)
 
-    return tf.concat([gaussian, label[:, num_events:]], axis=1)
+    res = tf.concat([gaussian, label[:, num_events:]], axis=1)
+    return res
 
 
 def tf_convolve(input, kernel):
