@@ -1,9 +1,9 @@
 hydra:
   run:
-    dir: ${dir.output_dir}/${hydra.job.name}/${hydra.job.override_dirname}
+    dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}/single
   sweep:
-    dir: ${dir.output_dir}/${hydra.job.name}/
-    subdir: ${hydra.job.override_dirname}
+    dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}
+    subdir: run${hydra.job.num}
   launcher:
     _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
   sweeper:
@@ -113,12 +113,12 @@ hydra:
     - hydra.mode=RUN
     task: []
   job:
-    name: prepare_data
+    name: train
     chdir: true
     override_dirname: ''
     id: ???
     num: ???
-    config_name: prepare_data
+    config_name: train
     env_set: {}
     env_copy: []
     config:
@@ -129,7 +129,7 @@ hydra:
   runtime:
     version: 1.3.2
     version_base: '1.3'
-    cwd: /home/lyu/AI/CMI
+    cwd: /home/lyu/AI/CMI/run
     config_sources:
     - path: hydra.conf
       schema: pkg
@@ -140,7 +140,7 @@ hydra:
     - path: ''
       schema: structured
       provider: schema
-    output_dir: /home/lyu/AI/CMI/None/prepare_data
+    output_dir: /home/lyu/AI/CMI/run/None/train/dummy/single
     choices:
       dir: local
       hydra/env: default
