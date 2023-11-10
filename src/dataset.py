@@ -1,11 +1,6 @@
 import numpy as np
-import pandas as pd
 import tensorflow as tf
-import typing 
-import polars as pl
 from omegaconf import DictConfig
-from pathlib import Path
-import os, joblib
 from scipy import stats
 from functools import partial
 
@@ -28,21 +23,20 @@ def get_dataset(cfg: DictConfig, mode='train') -> None:
         if mode == 'train':
             seq_len = cfg.duration * 2
             start = rng.make_seeds(1)[0] % (seq_len - cfg.duration)
-            start = tf.squeeze(start)
+            # start = tf.squeeze(start)
             end = start + cfg.duration
             for feats in cfg.features:
-                if example[feats].shape[0] == seq_len:
-                    example[feats] = tf.slice(example[feats], start, end)
+                if tf.shape(example[feats])[0] == seq_len:
+                    example[feats] = tf.slice(example[feats], start, [cfg.duration])
             for label_name in ('onset', 'wakeup'):
                 example[label_name] = tf.boolean_mask(example[label_name], (start <= example[label_name]) & (example[label_name] < end))
         elif mode == 'validation':
-            seq_len, start = cfg.duration, 0
-            end = seq_len
+            start = 0
         
         feature = {}
         for feats in cfg.features:
             feature[feats] = example[feats]
-        label = get_label(example, seq_len//2, start)
+        label = get_label(example, cfg.duration, start)
         if mode == 'train':
             label = gaussian_label(
                 label, offset=cfg.label.offset, sigma=cfg.label.sigma
@@ -51,7 +45,7 @@ def get_dataset(cfg: DictConfig, mode='train') -> None:
         return feature, label
     # os.walk(Path(cfg.dir.processed_dir))
 
-    filenames = tf.io.gfile.glob(cfg.dir.processed_dir+"/*1.tfrec")
+    filenames = tf.io.gfile.glob(cfg.dir.processed_dir+'/' + mode + "*1.tfrec")
     AUTOTUNE = tf.data.AUTOTUNE
     rng = tf.random.Generator.from_seed(123, alg='philox')
     dataset = (
@@ -68,20 +62,21 @@ def get_label(example, label_len: int, start: int):
     onset_label= tf.zeros((label_len,))
     wakeup_label = tf.zeros((label_len,))
     awake_label = tf.fill((label_len,), -1.)
-    start = tf.squeeze(start)
-    onset_label = tf.tensor_scatter_nd_update(onset_label, example['onset'][:, tf.newaxis]-start, tf.cast(tf.ones_like(example['onset']), tf.float32))
-    awake_label = tf.tensor_scatter_nd_update(awake_label, example['onset'][:, tf.newaxis]-start-1, tf.cast(tf.zeros_like(example['onset']), tf.float32))
-    wakeup_label = tf.tensor_scatter_nd_update(wakeup_label, example['wakeup'][:, tf.newaxis]-start, tf.cast(tf.ones_like(example['wakeup']), tf.float32))
-    awake_label = tf.tensor_scatter_nd_update(awake_label, example['wakeup'][:, tf.newaxis]-start-1, tf.cast(tf.ones_like(example['wakeup']), tf.float32))
-    
-    mask = tf.concat([[-1], tf.squeeze(tf.where(awake_label > -1))], axis=0)
+    start = tf.cast(tf.squeeze(start), tf.int64)
+    if tf.size(example['onset']) > 0:
+        onset_label = tf.tensor_scatter_nd_update(onset_label, example['onset'][:, tf.newaxis]-start, tf.ones_like(example['onset'], dtype=tf.float32))
+        awake_label = tf.tensor_scatter_nd_update(awake_label, example['onset'][:, tf.newaxis]-start-1, tf.zeros_like(example['onset'], dtype=tf.float32))
+    if tf.size(example['wakeup']) > 0:
+        wakeup_label = tf.tensor_scatter_nd_update(wakeup_label, example['wakeup'][:, tf.newaxis]-start, tf.ones_like(example['wakeup'],dtype= tf.float32))
+        awake_label = tf.tensor_scatter_nd_update(awake_label, example['wakeup'][:, tf.newaxis]-start-1, tf.ones_like(example['wakeup'],dtype= tf.float32))
+    mask = tf.concat([[-1], tf.reshape(tf.where(awake_label > -1.), (-1,))], axis=0)
     for idx in tf.range(tf.shape(mask)[0]-1):
         indices = tf.range(mask[idx]+1, mask[idx+1])[:, tf.newaxis]
         updates = tf.repeat(awake_label[mask[idx+1]], tf.shape(indices)[0])
         awake_label = tf.tensor_scatter_nd_update(awake_label, indices, updates)
     indices = tf.range(mask[-1]+1, tf.shape(awake_label)[0])[:, tf.newaxis]
     updates = tf.repeat(tf.cast(tf.logical_not(tf.cast(awake_label[mask[-1]], tf.bool)), tf.float32), tf.shape(indices)[0])
-    #라벨이 하나도 없으면 그냥 깨어있는걸로
+    # #라벨이 하나도 없으면 그냥 깨어있는걸로
     if tf.shape(mask)[0] == 1:
         updates = tf.repeat(1., tf.shape(indices)[0])
     awake_label = tf.tensor_scatter_nd_update(awake_label, indices, updates)

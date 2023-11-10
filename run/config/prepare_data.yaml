@@ -11,6 +11,7 @@ hydra:
 defaults:
   - _self_
   - dir: local
+  - split: fold_0
 
 phase: train
 duration: 5760

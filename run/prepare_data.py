@@ -10,39 +10,74 @@ import tensorflow as tf
 
 @hydra.main(config_path="config", config_name="prepare_data", version_base=None)
 def main(cfg: DictConfig):
+    id_map = (
+        pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_id_map.parquet')
+        .collect()
+        .to_pandas()
+    )
+    id_map = dict([(row['series_id'], row['id_map']) for _, row in id_map.iterrows()])
     if cfg.datatype == 'origin':
         series = (
-            pl.scan_parquet(Path(cfg.dir.data_dir) / f'{cfg.phase}_series.parquet')
+            pl.scan_parquet(Path(cfg.dir.data_dir) / f'train_series.parquet')
             .collect()
             .to_pandas()
+            .merge(id_map, how='left', on='series_id')
         )
-        events = pd.read_csv(Path(cfg.dir.data_dir) / f'{cfg.phase}_events.csv').dropna()
+        events = pd.read_csv(Path(cfg.dir.data_dir) / f'train_events.csv').dropna().merge(id_map, how='left', on='series_id')
         events = events.replace({'onset':'1', 'wakeup':'2'})
     elif cfg.datatype == 'reduced':
         series = (
-            pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'{cfg.phase}_series.parquet')
+            pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_series.parquet')
             .collect()
             .to_pandas()
-            .rename(columns = {'id_map' : 'series_id'})
         )
         events = (
-            pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'{cfg.phase}_events.parquet')
+            pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_events.parquet')
             .collect()
             .to_pandas()
             .dropna()
-            .rename(columns = {'id_map' : 'series_id'})
         )
-    preprocess_data(cfg, events, series, mode=cfg.phase)
+    if cfg.phase.startswith('train'):
+        preprocess_train_data(cfg, events, series, id_map)
+    elif cfg.phase == 'validation':
+        preprocess_valid_data(cfg, events, series, id_map)
 
-def preprocess_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, mode: str)\
+def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
     -> None:
-    series_ids = events.series_id.unique()
+    series_ids = set(events.id_map.unique())
+    series_ids &= set(map(lambda x: id_map[x], cfg.split.valid_series_ids))
     data = []
     target = []
     for series_idx, id in enumerate(tqdm(series_ids)):
-            
-        curr_events = events.query('series_id == @id').reset_index(drop=True).sort_values(by='step')
-        curr_series = series.query('series_id == @id').reset_index().sort_values(by='step')
+        curr_events = events.query('id_map == @id').reset_index(drop=True).sort_values(by='step')
+        curr_series = series.query('id_map == @id').reset_index().sort_values(by='step')
+        for i in range(len(curr_series)//cfg.duration+1):
+            start, end = cfg.duration * i, min(cfg.duration * (i+1), len(curr_series))
+            series_data = curr_series.loc[start: end-1, cfg.features]
+            if len(series_data) != cfg.duration:
+                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration - len(series_data)), columns=series_data.columns)
+                series_data = pd.concat([series_data, padding_df], ignore_index=True)
+            event_target = curr_events.query('@start < step and step < @end')
+            onsets = (event_target.query('event == 1').step.values - start).astype(np.uint32)
+            wakeups = (event_target.query('event == 2').step.values - start).astype(np.uint32)
+            data.append(series_data)
+            target.append((onsets, wakeups))
+        if series_idx != 0 and (series_idx % 10 == 0 or series_idx == len(series_ids)-1):
+            convert_and_save(cfg, data, target, (series_idx-1)//10)
+            data = []
+            target = []
+    return
+
+def preprocess_train_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
+    -> None:
+    series_ids = set(events.id_map.unique())
+    if cfg.phase != 'train_all':
+        series_ids &= set(map(lambda x: id_map[x], cfg.split.train_series_ids))
+    data = []
+    target = []
+    for series_idx, id in enumerate(tqdm(series_ids)):
+        curr_events = events.query('id_map == @id').reset_index(drop=True).sort_values(by='step')
+        curr_series = series.query('id_map == @id').reset_index().sort_values(by='step')
         for i in range(len(curr_events)-1):
             start, end = max(0, curr_events.iloc[i].step-cfg.duration), min(curr_events.iloc[i].step+cfg.duration, len(curr_series))
             series_data = curr_series.loc[start: end-1, cfg.features]
