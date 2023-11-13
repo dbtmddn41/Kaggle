@@ -51,7 +51,7 @@ class EncoderLayer(keras.Model):
         return out
     
 class GRUNet(keras.Model):
-    def __init__(self, conv_arch, hidden_size, n_layers):
+    def __init__(self, conv_arch, hidden_size, n_layers, output_num):
         super().__init__()
         self.conv = keras.Sequential([EncoderLayer(filters, kernel_size, strides, padding='same')
                                     for _, filters, kernel_size, strides in conv_arch], name='conv')
@@ -60,7 +60,7 @@ class GRUNet(keras.Model):
                                                layers.Conv1D(filters, kernel_size, strides=1, padding='same', activation='relu'),
                                                layers.Conv1D(filters, kernel_size, strides=1, padding='same', activation='relu')]
                                                for filters, _, kernel_size, strides in reversed(conv_arch)], []), name='convtrans')
-        self.output_layer = layers.Conv1D(2, 1, 1, activation='sigmoid')
+        self.output_layer = layers.Conv1D(output_num, 1, 1, activation='sigmoid')
     def call(self, inputs):
         x = self.conv(inputs)
         x = self.res_bigrus(x)
@@ -74,6 +74,6 @@ if __name__ == '__main__':
     arch = [(2, 8, 17, 2),
         (8, 32, 11, 2),
         (32, hidden_units, 7, 2)]
-    model = GRUNet(arch, hidden_units, n_layers)
+    model = GRUNet(arch, hidden_units, n_layers,3)
     model.build(input_shape=(None, 25000, 2))
     model.summary()

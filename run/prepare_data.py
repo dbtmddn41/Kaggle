@@ -10,22 +10,39 @@ import tensorflow as tf
 
 @hydra.main(config_path="config", config_name="prepare_data", version_base=None)
 def main(cfg: DictConfig):
-    id_map = (
-        pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_id_map.parquet')
-        .collect()
-        .to_pandas()
-    )
-    id_map = dict([(row['series_id'], row['id_map']) for _, row in id_map.iterrows()])
+    
+    if cfg.phase == 'test':
+        series = (
+            pl.scan_parquet(Path(cfg.dir.data_dir) / f'test_series.parquet')
+            .collect()
+            .to_pandas()
+        )
+        series_ids = pd.unique(series['series_id'])
+        id_map = pd.DataFrame(enumerate(series_ids), columns=['id_map', 'series_id'])
+        series = series.merge(id_map, how='left', on='series_id')
+        id_map = dict(enumerate(series_ids))
+        preprocess_test_data(cfg, series, id_map)
+        return
+    
     if cfg.datatype == 'origin':
         series = (
             pl.scan_parquet(Path(cfg.dir.data_dir) / f'train_series.parquet')
             .collect()
             .to_pandas()
-            .merge(id_map, how='left', on='series_id')
         )
+        series_ids = pd.unique(series['series_id'])
+        id_map = pd.DataFrame(enumerate(series_ids), columns=['id_map', 'series_id'])
+        series = series.merge(id_map, how='left', on='series_id')
         events = pd.read_csv(Path(cfg.dir.data_dir) / f'train_events.csv').dropna().merge(id_map, how='left', on='series_id')
         events = events.replace({'onset':'1', 'wakeup':'2'})
+        id_map = dict(enumerate(series_ids))
     elif cfg.datatype == 'reduced':
+        id_map = (
+            pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_id_map.parquet')
+            .collect()
+            .to_pandas()
+            )
+        id_map = dict([(row['series_id'], row['id_map']) for _, row in id_map.iterrows()])
         series = (
             pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_series.parquet')
             .collect()
@@ -42,6 +59,24 @@ def main(cfg: DictConfig):
     elif cfg.phase == 'validation':
         preprocess_valid_data(cfg, events, series, id_map)
 
+def preprocess_test_data(cfg: DictConfig, series: pd.DataFrame, id_map: dict)\
+    -> None:
+    series_ids = id_map.keys()
+    data = []
+    for series_idx, id in enumerate(tqdm(series_ids)):
+        curr_series = series.query('id_map == @id').reset_index().sort_values(by='step')
+        for i in range(len(curr_series)//cfg.duration+1):
+            start, end = cfg.duration * i, min(cfg.duration * (i+1), len(curr_series))
+            series_data = curr_series.loc[start: end-1, cfg.features]
+            if len(series_data) != cfg.duration:
+                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration - len(series_data)), columns=series_data.columns)
+                series_data = pd.concat([series_data, padding_df], ignore_index=True)
+            data.append(series_data)
+        if series_idx != 0 and (series_idx % 10 == 0 or series_idx == len(series_ids)-1):
+            convert_and_save(cfg, data, [], (series_idx-1)//10)
+            data = []
+    return
+
 def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
     -> None:
     series_ids = set(events.id_map.unique())
@@ -50,7 +85,11 @@ def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
     target = []
     for series_idx, id in enumerate(tqdm(series_ids)):
         curr_events = events.query('id_map == @id').reset_index(drop=True).sort_values(by='step')
+        time_delta = pd.Timedelta(hours=8)      #8시간은 그냥 고정값으로 쓰겠습니다.
+        #reduce 버전은 timestamp가 str이 아니라 진짜 timestamp로 되어있음. reduce가 아닌 버전을 쓰려면 수정 필요.
+        start_time, end_time = curr_events.iloc[0].timestamp - time_delta, curr_events.iloc[-1].timestamp + time_delta
         curr_series = series.query('id_map == @id').reset_index().sort_values(by='step')
+        curr_series = curr_series.query('@start_time < timestamp and  timestamp < @end_time')
         for i in range(len(curr_series)//cfg.duration+1):
             start, end = cfg.duration * i, min(cfg.duration * (i+1), len(curr_series))
             series_data = curr_series.loc[start: end-1, cfg.features]
@@ -62,8 +101,8 @@ def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
             wakeups = (event_target.query('event == 2').step.values - start).astype(np.uint32)
             data.append(series_data)
             target.append((onsets, wakeups))
-        if series_idx != 0 and (series_idx % 10 == 0 or series_idx == len(series_ids)-1):
-            convert_and_save(cfg, data, target, (series_idx-1)//10)
+        if series_idx != 0 and (series_idx % 30 == 0 or series_idx == len(series_ids)-1):
+            convert_and_save(cfg, data, target, (series_idx-1)//30)
             data = []
             target = []
     return
@@ -99,15 +138,24 @@ def convert_and_save(cfg: DictConfig, data: list, target: list, idx: int) -> Non
     with tf.io.TFRecordWriter(
         str(Path(cfg.dir.processed_dir) / f"{cfg.phase}_data_{idx}.tfrec")
     ) as writer:
-        for df, (onset, wakeup) in zip(data, target):
-            example = create_example(df, onset, wakeup)
-            writer.write(example.SerializeToString())
+        if cfg.phase.startswith('train') or cfg.phase == 'validation':
+            for df, (onset, wakeup) in zip(data, target):
+                example = create_train_example(df, onset, wakeup)
+                writer.write(example.SerializeToString())
+        elif cfg.phase == 'test':
+            for df in data:
+                example = create_test_example(df)
+                writer.write(example.SerializeToString())
 
-def create_example(df: pd.DataFrame, onset, wakeup):
+def create_train_example(df: pd.DataFrame, onset, wakeup):
     feature = {
         "onset": int64_feature_list(list(onset)),
         "wakeup": int64_feature_list(list(wakeup)),
     }
+    feature.update(dict([(col, float_feature_list(list(df[col].values))) for col in df.columns]))
+    return tf.train.Example(features=tf.train.Features(feature=feature))
+def create_test_example(df: pd.DataFrame):
+    feature = {}
     feature.update(dict([(col, float_feature_list(list(df[col].values))) for col in df.columns]))
     return tf.train.Example(features=tf.train.Features(feature=feature))
 
