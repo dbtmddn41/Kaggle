@@ -1,6 +1,6 @@
 data_dir: /kaggle/input/child-mind-institute-detect-sleep-states
 reduced_data_dir: /kaggle/input/detect-sleep-states-memory-decrease
-processed_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states/processed_data
+processed_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states/data/processed_data
 output_dir: /kaggle/working/output
 sub_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states
 src_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states/src
