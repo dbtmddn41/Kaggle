@@ -26,14 +26,12 @@ def main(cfg: DictConfig):
         keras.callbacks.EarlyStopping('val_average_precision', patience=6, start_from_epoch=10),
         keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.1, patience=5),
     ]
-    try:
-        history = model.fit(train_ds, epochs=cfg.epochs, validation_data=validation_ds, callbacks=callbacks, class_weight={0:1.,1:1.,2:0.5})
-    finally:
-        best_model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model+'.keras')
-        preds = best_model.predict(validation_ds)
-        y = np.concatenate([y for x, y in validation_ds], axis=0)
-        m = EventDetectionAveragePrecision()
-        m.update_state(y, preds)
-        print(m.result())
+    history = model.fit(train_ds, epochs=cfg.epochs, validation_data=validation_ds, callbacks=callbacks, class_weight={0:1.,1:1.,2:0.5})
+    best_model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model+'.keras')
+    preds = best_model.predict(validation_ds)
+    y = np.concatenate([y for x, y in validation_ds], axis=0)
+    m = EventDetectionAveragePrecision()
+    m.update_state(y, preds)
+    print(m.result())
 if __name__ == '__main__':
     main()
