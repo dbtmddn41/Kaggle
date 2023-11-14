@@ -16,11 +16,11 @@ defaults:
 #model
 model_type: 'single'
 model: 'GRUNet'
-hidden_units: 64
+hidden_units: 128
 n_layers: 4
 
 #fit
-epochs: 10
+epochs: 30
 
 metric:
  AP_threshold: 0.0

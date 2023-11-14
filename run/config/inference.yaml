@@ -16,9 +16,9 @@ defaults:
 exp_name: dummy
 phase: test
 
-weight:
-  exp_name: ${exp_name}
-  run_name: single
+#model
+model_type: 'single'
+model: 'GRUNet'
 
 #Dataset
 negative_sampling_rate:
@@ -35,9 +35,8 @@ augmentation:
   cutmix_alpha: 0.4
 
 # post_process
-post_process:
-  score_th: 0.02
-  distance: 10
+score_th: 0.02
+distance: 120
 
 label:
   offset: 10

@@ -12,7 +12,19 @@ def get_model(cfg: DictConfig):
             arch = [(2, 8, 12, 2),
                 (8, 32, 10, 2),
                 (32, cfg.hidden_units, 7, 2)]
-            model = GRUNet(arch, cfg.hidden_units, cfg.n_layers, len(cfg.label.labels))
+            model = GRUNet(arch, cfg.hidden_units, cfg.n_layers, len(cfg.label.labels), gru_dropout_rate=0.0, dropout_rate=0.3)
+    elif cfg.model_type == 'dual':
+        pass
+    elif cfg.model_type == 'triple':
+        pass
+    model.build(input_shape=(None, cfg.duration, len(cfg.features)))
+    return model
+
+
+def load_model(cfg: DictConfig):
+    if cfg.model_type == 'single':
+        if cfg.model == 'GRUNet':
+            model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model+'.keras')
     elif cfg.model_type == 'dual':
         pass
     elif cfg.model_type == 'triple':

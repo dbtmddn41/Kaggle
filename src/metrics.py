@@ -2,19 +2,20 @@ import tensorflow as tf
 from tensorflow import keras
 
 class AveragePrecision(keras.metrics.Metric):
-    def __init__(self, threshold=0.5, name="average_precision",**kwargs):
+    def __init__(self, threshold=0.0, name="average_precision",**kwargs):
         super().__init__(name=name, **kwargs)
-        self.metric = keras.metrics.AUC(curve='PR', summation_method='minoring')
+        self.metric = keras.metrics.AUC(curve='PR')
         self.threshold = threshold
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         num_tp = tf.cast(tf.reduce_sum(y_true), tf.int32)
         y_true = y_true[: ,:, :2]
         y_pred = y_pred[: ,:, :2]
-        idx = y_pred >= self.threshold#tf.concat([tf.sort(y_pred[:, :, 0], axis=1, direction='DESCENDING')[:, num_tp, tf.newaxis, tf.newaxis], tf.sort(y_pred[:, :, 1], axis=1, direction='DESCENDING')[:, num_tp, tf.newaxis, tf.newaxis]], axis=2)
-        idx = (idx) | (y_true > self.threshold)
-        y_true = y_true[idx]
-        y_pred = y_pred[idx]
+        if self.threshold > 0.:
+            idx = y_pred >= self.threshold#tf.concat([tf.sort(y_pred[:, :, 0], axis=1, direction='DESCENDING')[:, num_tp, tf.newaxis, tf.newaxis], tf.sort(y_pred[:, :, 1], axis=1, direction='DESCENDING')[:, num_tp, tf.newaxis, tf.newaxis]], axis=2)
+            idx = (idx) | (y_true > self.threshold)
+            y_true = y_true[idx]
+            y_pred = y_pred[idx]
         self.metric.update_state(y_true, y_pred)
 
     def result(self):

@@ -3,9 +3,9 @@ from tensorflow import keras
 from keras import layers
 
 class ResidualBiGRU(keras.Model):
-    def __init__(self, hidden_size, n_layers=1):
+    def __init__(self, hidden_size, dropout_rate, n_layers=1):
         super().__init__()
-        self.grus = keras.Sequential([layers.Bidirectional(layers.GRU(hidden_size, return_sequences=True))
+        self.grus = keras.Sequential([layers.Bidirectional(layers.GRU(hidden_size, return_sequences=True, dropout=dropout_rate))
                     for _ in range(n_layers)])
         self.fc1 = layers.TimeDistributed(layers.Dense(hidden_size * 4))
         self.ln1 = layers.LayerNormalization()
@@ -24,11 +24,11 @@ class ResidualBiGRU(keras.Model):
         return out
     
 class MultiResidualBiGRU(keras.Model):
-    def __init__(self, hidden_size, out_size, n_layers):
+    def __init__(self, hidden_size, out_size, n_layers, dropout_rate):
         super().__init__()
         self.fc_in = layers.Dense(hidden_size)
         self.ln = layers.LayerNormalization()
-        self.res_bigrus = keras.Sequential([ResidualBiGRU(hidden_size, n_layers=1) for _ in range(n_layers)])
+        self.res_bigrus = keras.Sequential([ResidualBiGRU(hidden_size, dropout_rate, n_layers) for _ in range(n_layers)])
         self. fc_out = layers.TimeDistributed(layers.Dense(out_size))
 
     def call(self, inputs):
@@ -51,20 +51,22 @@ class EncoderLayer(keras.Model):
         return out
     
 class GRUNet(keras.Model):
-    def __init__(self, conv_arch, hidden_size, n_layers, output_num):
+    def __init__(self, conv_arch, hidden_size, n_layers, output_num, gru_dropout_rate=0.2, dropout_rate=0.4):
         super().__init__()
         self.conv = keras.Sequential([EncoderLayer(filters, kernel_size, strides, padding='same')
                                     for _, filters, kernel_size, strides in conv_arch], name='conv')
-        self.res_bigrus = MultiResidualBiGRU(hidden_size, hidden_size, n_layers)
+        self.res_bigrus = MultiResidualBiGRU(hidden_size, hidden_size, n_layers, gru_dropout_rate)
         self.convtranspose = keras.Sequential(sum([[layers.Conv1DTranspose(filters, kernel_size, strides, padding='same'),
                                                layers.Conv1D(filters, kernel_size, strides=1, padding='same', activation='relu'),
                                                layers.Conv1D(filters, kernel_size, strides=1, padding='same', activation='relu')]
                                                for filters, _, kernel_size, strides in reversed(conv_arch)], []), name='convtrans')
+        self.dropout = layers.Dropout(dropout_rate)
         self.output_layer = layers.Conv1D(output_num, 1, 1, activation='sigmoid')
     def call(self, inputs):
         x = self.conv(inputs)
         x = self.res_bigrus(x)
         x = self.convtranspose(x)
+        x = self.dropout(x)
         outputs = self.output_layer(x)
         return outputs
     
