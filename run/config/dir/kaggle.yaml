@@ -1,5 +1,9 @@
 data_dir: /kaggle/input/child-mind-institute-detect-sleep-states
 processed_dir: /kaggle/working/processed_data
 output_dir: /kaggle/working/output
-model_dir: /kaggle/input/cmi-model
 sub_dir: /kaggle/working
+src_dir: /kaggle/working/src
+reduced_data_dir: /kaggle/working/data/detect-sleep-states-memory-decrease
+output_dir: /kaggle/working/
+model_dir: /kaggle/working/src/models
+model_save_dir: /kaggle/input/cmi-model
