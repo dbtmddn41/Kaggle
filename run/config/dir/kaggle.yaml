@@ -4,6 +4,5 @@ processed_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states/p
 output_dir: /kaggle/working/output
 sub_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states
 src_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states/src
-output_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states
 model_dir: /kaggle/working/kaggle-child-mind-institute-detect-sleep-states/src/models
 model_save_dir: /kaggle/input/cmi-model
