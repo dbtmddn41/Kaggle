@@ -4,9 +4,9 @@ hydra:
     name: train
     chdir: true
   run:
-    dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}/single
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
   sweep:
-    dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
     subdir: run${hydra.job.num}
 
 exp_name: run
@@ -19,6 +19,8 @@ model: 'GRUNet'
 hidden_units: 64
 n_layers: 4
 finetune: 0
+dropout_rate: 0.0
+gru_dropout_rate: 0.2
 
 #fit
 epochs: 30
@@ -27,7 +29,6 @@ metric:
  AP_threshold: 0.0
 
 #Dataset
-negative_sampling_rate:
 duration: 5760
 downsample_rate:
 upsample_rate:

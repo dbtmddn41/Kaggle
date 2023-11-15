@@ -12,7 +12,7 @@ def get_model(cfg: DictConfig):
             arch = [(8, 16, 12, 2),
                 (16, 32, 10, 2),
                 (32, cfg.hidden_units, 7, 2)]
-            model = GRUNet(arch, cfg.hidden_units, cfg.n_layers, len(cfg.label.labels), gru_dropout_rate=0.0, dropout_rate=0.0)
+            model = GRUNet(arch, cfg.hidden_units, cfg.n_layers, len(cfg.label.labels), gru_dropout_rate=cfg.gru_dropout_rate, dropout_rate=cfg.dropout_rate)
     elif cfg.model_type == 'dual':
         pass
     elif cfg.model_type == 'triple':

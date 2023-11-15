@@ -4,11 +4,12 @@ hydra:
     name: inference
     chdir: true
   run:
-    dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
   sweep:
-    dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
     subdir: run${hydra.job.num}
 
+exp_name: run
 defaults:
   - _self_
   - dir: local

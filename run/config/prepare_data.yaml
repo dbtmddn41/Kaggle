@@ -3,16 +3,18 @@ hydra:
     name: prepare_data
     chdir: true
   run:
-    dir: ${dir.output_dir}/${hydra.job.name}/${hydra.job.override_dirname}
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
   sweep:
-    dir: ${dir.output_dir}/${hydra.job.name}/
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
     subdir: ${hydra.job.override_dirname}
 
+exp_name: run
 defaults:
   - _self_
   - dir: local
   - split: fold_0
-
+  - series_parquet: 'train_series.parquet'
+  - event_csv: 'train_events.parquet'
 phase: train
 duration: 5760
 datatype: reduced
