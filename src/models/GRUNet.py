@@ -55,7 +55,8 @@ class GRUNet(keras.Model):
         super().__init__()
         self.conv = keras.Sequential([EncoderLayer(filters, kernel_size, strides, padding='same')
                                     for _, filters, kernel_size, strides in conv_arch], name='conv')
-        self.res_bigrus = MultiResidualBiGRU(hidden_size, hidden_size, n_layers, gru_dropout_rate)
+        self.res_bigrus = keras.Sequential([ResidualBiGRU(hidden_size, gru_dropout_rate, n_layers) for _ in range(n_layers)])
+        #MultiResidualBiGRU(hidden_size, hidden_size, n_layers, gru_dropout_rate)
         self.convtranspose = keras.Sequential(sum([[layers.Conv1DTranspose(filters, kernel_size, strides, padding='same'),
                                                layers.Conv1D(filters, kernel_size, strides=1, padding='same', activation='relu'),
                                                layers.Conv1D(filters, kernel_size, strides=1, padding='same', activation='relu')]

@@ -9,15 +9,16 @@ hydra:
     dir: ${dir.output_dir}/${hydra.job.name}/${exp_name}
     subdir: run${hydra.job.num}
 
-exp_name: dummy
+exp_name: run
 defaults:
   - _self_
   - dir: local
 #model
 model_type: 'single'
 model: 'GRUNet'
-hidden_units: 128
+hidden_units: 64
 n_layers: 4
+finetune: 0
 
 #fit
 epochs: 30
@@ -30,7 +31,7 @@ negative_sampling_rate:
 duration: 5760
 downsample_rate:
 upsample_rate:
-batch_size: 32
+batch_size: 64
 
 augmentation:
   mixup_prob: 0.0

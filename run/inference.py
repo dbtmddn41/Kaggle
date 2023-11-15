@@ -14,7 +14,6 @@ from scipy.signal import find_peaks
 
 @hydra.main(config_path="config", config_name="inference", version_base=None)
 def main(cfg: DictConfig):
-    test_ds = get_dataset(cfg, mode='test')
     model = load_model(cfg)
     test_series = (
             pl.scan_parquet(Path(cfg.dir.data_dir) / f'test_series.parquet')
