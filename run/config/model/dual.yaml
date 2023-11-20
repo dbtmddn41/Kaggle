@@ -1,0 +1,6 @@
+name: dual
+defaults:
+  - _self_
+  - feature_extractor: CNN
+  - decoder: UNetDecoder
+model_name: dual_CNN_UNetDecoder

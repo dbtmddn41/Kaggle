@@ -13,18 +13,40 @@ defaults:
   - _self_
   - dir: local
   - split: fold_0
-  - series_parquet: 'train_series.parquet'
-  - event_csv: 'train_events.parquet'
+series_parquet: 'choi_train_series.parquet'
+event_csv: 'train_events.csv'
 phase: train
 duration: 5760
-datatype: reduced
+datatype: feature_engineering
 # feature
 features: 
   - "anglez"
   - "enmo"
+  - "lids"
+  - 'weekday'
+  - 'signal_onset'
+  - 'signal_awake'
+  - 'hour'
+  # - 'enmo_rolling_mean'
+  # - 'enmo_rolling_max'
+  # - 'enmo_rolling_std'
+  # - 'anglez_rolling_mean'
+  # - 'anglez_rolling_max'
+  # - 'anglez_rolling_std'
+  # - 'enmo_prev_diff_rolling_mean'
+  # - 'enmo_prev_diff_rolling_max'
+  # - 'anglez_prev_diff_rolling_mean'
+  # - 'anglez_prev_diff_rolling_max'
+  # - 'anglez_mad'
+  # - 'enmo_mad'
+  - 'anglez_sin'
+  # - 'anglez_cos'
+  # - 'anglez_tan'
+
   # - "month_sin" 
   # - "month_cos"
   # - "hour_sin"
   # - "hour_cos"
   # - "minute_sin"
   # - "minute_cos"
+  

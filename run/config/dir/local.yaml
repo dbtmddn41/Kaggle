@@ -1,6 +1,7 @@
 src_dir: /home/lyu/AI/CMI/src
 data_dir: /home/lyu/AI/CMI/data/child-mind-institute-detect-sleep-states
 reduced_data_dir: /home/lyu/AI/CMI/data/detect-sleep-states-memory-decrease
+feature_eng_dir: /home/lyu/AI/CMI/data/feature_engineered
 processed_dir: /home/lyu/AI/CMI/data/preprocessed_data
 output_dir: /home/lyu/AI/CMI
 model_dir: /home/lyu/AI/CMI/src/models

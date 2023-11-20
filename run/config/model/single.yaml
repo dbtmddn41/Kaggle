@@ -1,0 +1,5 @@
+name: single
+defaults:
+  - _self_
+  - single: GRUNet
+model_name: single_GRUNet #${name}_${single.name}

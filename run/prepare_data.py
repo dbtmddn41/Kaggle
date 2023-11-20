@@ -34,8 +34,8 @@ def main(cfg: DictConfig):
         id_map = pd.DataFrame(enumerate(series_ids), columns=['id_map', 'series_id'])
         series = series.merge(id_map, how='left', on='series_id')
         events = pd.read_csv(Path(cfg.dir.data_dir) / f'train_events.csv').dropna().merge(id_map, how='left', on='series_id')
-        events = events.replace({'onset':'1', 'wakeup':'2'})
-        id_map = dict(enumerate(series_ids))
+        events = events.replace({'onset':1, 'wakeup':2})
+        id_map = dict([(id, i) for i, id in enumerate(series_ids)])
     elif cfg.datatype == 'reduced':
         id_map = (
             pl.scan_parquet(Path(cfg.dir.reduced_data_dir) / f'train_id_map.parquet')
@@ -56,16 +56,17 @@ def main(cfg: DictConfig):
         )
     elif cfg.datatype == 'feature_engineering':
         series = (
-            pl.scan_parquet(Path(cfg.dir.data_dir) / cfg.series_parquet)
+            pl.scan_parquet(Path(cfg.dir.feature_eng_dir) / cfg.series_parquet)
             .collect()
             .to_pandas()
         )
-        series_ids = pd.unique(series['series_id'])
-        id_map = pd.DataFrame(enumerate(series_ids), columns=['id_map', 'series_id'])
-        series = series.merge(id_map, how='left', on='series_id')
+        # series_ids = pd.unique(series['series_id'])
+        id_map = series[['id_map', 'series_id']].drop_duplicates()
+        # series = series.merge(id_map, how='left', on='series_id')
         events = pd.read_csv(Path(cfg.dir.data_dir) / cfg.event_csv).dropna().merge(id_map, how='left', on='series_id')
-        events = events.replace({'onset':'1', 'wakeup':'2'})
-        id_map = dict(enumerate(series_ids))
+        events['timestamp'] = pd.to_datetime(events["timestamp"]).apply(lambda t: t.tz_localize(None))
+        events = events.replace({'onset':1, 'wakeup':2})
+        id_map = dict([(series_id,id_map) for i, (id_map, series_id) in id_map.iterrows()])
     if cfg.phase.startswith('train'):
         preprocess_train_data(cfg, events, series, id_map)
     elif cfg.phase == 'validation':
@@ -113,8 +114,8 @@ def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
             wakeups = (event_target.query('event == 2').step.values - start).astype(np.uint32)
             data.append(series_data)
             target.append((onsets, wakeups))
-        if series_idx != 0 and (series_idx % 30 == 0 or series_idx == len(series_ids)-1):
-            convert_and_save(cfg, data, target, (series_idx-1)//30)
+        if series_idx != 0 and (series_idx % 5 == 0 or series_idx == len(series_ids)-1):
+            convert_and_save(cfg, data, target, (series_idx-1)//5)
             data = []
             target = []
     return
@@ -140,8 +141,8 @@ def preprocess_train_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
             wakeups = (event_target.query('event == 2').step.values - start).astype(np.uint32)
             data.append(series_data)
             target.append((onsets, wakeups))
-        if series_idx != 0 and (series_idx % 50 == 0 or series_idx == len(series_ids)-1):
-            convert_and_save(cfg, data, target, (series_idx-1)//50)
+        if series_idx != 0 and (series_idx % 5 == 0 or series_idx == len(series_ids)-1):
+            convert_and_save(cfg, data, target, (series_idx-1)//5)
             data = []
             target = []
     return

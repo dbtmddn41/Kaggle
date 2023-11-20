@@ -3,7 +3,7 @@ hydra:
     dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
   sweep:
     dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
-    subdir: ${hydra.job.override_dirname}
+    subdir: run${hydra.job.num}
   launcher:
     _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
   sweeper:
@@ -111,15 +111,14 @@ hydra:
   overrides:
     hydra:
     - hydra.mode=RUN
-    task:
-    - phase=validation
+    task: []
   job:
-    name: prepare_data
+    name: train
     chdir: true
-    override_dirname: phase=validation
+    override_dirname: ''
     id: ???
     num: ???
-    config_name: prepare_data
+    config_name: train
     env_set: {}
     env_copy: []
     config:
@@ -141,9 +140,11 @@ hydra:
     - path: ''
       schema: structured
       provider: schema
-    output_dir: /home/lyu/AI/CMI/run/prepare_data
+    output_dir: /home/lyu/AI/CMI/run/train
     choices:
-      split: fold_0
+      model: dual
+      model/decoder: UNetDecoder
+      model/feature_extractor: CNN
       dir: local
       hydra/env: default
       hydra/callbacks: null
