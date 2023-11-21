@@ -1,0 +1,8 @@
+name: triple
+defaults:
+  - _self_
+  - feature_extractor: CNN
+  - decoder: UNetDecoder
+encoder_name: resnet34
+encoder_weights: imagenet
+model_name: dual_CNN_UNetDecoder

@@ -140,3 +140,15 @@ class Up(keras.Model):
         x = self.conv(x)
         x = self.norm(x)
         return x
+    
+if __name__ == '__main__':
+    double_conv = keras.Sequential([
+            layers.Conv1D(64, kernel_size=3, padding='same', use_bias=False),
+            layers.LayerNormalization(),
+            layers.ReLU(),
+            layers.Conv1D(64, kernel_size=3, padding='same', use_bias=False),
+            layers.LayerNormalization(),
+            layers.ReLU(),
+        ])
+    double_conv.build((None, 2880, 128))
+    print(double_conv.summary())

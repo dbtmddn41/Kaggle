@@ -7,6 +7,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.GRUNet import GRUNet, EncoderLayer, ResidualBiGRU
 from src.models.dual_model import DualModel
+from src.models.triple_model import TripleModel
 from src.models.decoder.UNetDecoder import UNetDecoder, Down, SEModule, DoubleConv
 from src.models.feature_extractor.CNN import CNN
 
@@ -22,9 +23,11 @@ def get_model(cfg: DictConfig):
         
     elif cfg.model.name == 'dual':
         # cfg.model.feature_extractor.params.strides[-1] = cfg.downsample_rate
-        model = DualModel(cfg.model.feature_extractor, cfg.model.decoder)
+        model = DualModel(cfg.model.feature_extractor, cfg.model.decoder,
+                          (cfg.duration//cfg.downsample_rate, cfg.model.feature_extractor.params.base_filters[-1], len(cfg.model.feature_extractor.params.kernel_sizes)))
     elif cfg.model.name == 'triple':
-        pass
+        model = TripleModel(cfg.model.feature_extractor, cfg.model.decoder,
+                          cfg.model.encoder_name, cfg.model.encoder_weights)
     model.build(input_shape=(None, cfg.duration, len(cfg.features)))
     return model
 
@@ -38,7 +41,8 @@ def load_model(cfg: DictConfig):
         custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down}
         model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', custom_objects=custom_objects)
     elif cfg.model.name == 'triple':
-        pass
+        custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down}
+        model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', custom_objects=custom_objects)
     model.build(input_shape=(None, cfg.duration, len(cfg.features)))
     return model
 

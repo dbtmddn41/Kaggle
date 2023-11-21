@@ -1,11 +1,15 @@
 exp_name: run
-epochs: 30
+wandb:
+  project: sleep state
+  entity: null
+  name: triple 300BCE+Focal
+epochs: 60
 finetune: 0
 metric:
   AP_threshold: 0.0
 duration: 5760
 downsample_rate: 2
-batch_size: 32
+batch_size: 8
 augmentation:
   mixup_prob: 0.0
   mixup_alpha: 0.5
@@ -40,7 +44,9 @@ dir:
   sub_dir: null
   tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
 model:
-  name: dual
+  name: triple
+  encoder_name: resnet34
+  encoder_weights: imagenet
   model_name: dual_CNN_UNetDecoder
   feature_extractor:
     name: CNN
@@ -51,10 +57,7 @@ model:
       - 32
       - 16
       - 4
-      strides:
-      - 1
-      - 1
-      - ${downsample_rate}
+      strides: ${downsample_rate}
       pooling: false
   decoder:
     name: UNetDecoder

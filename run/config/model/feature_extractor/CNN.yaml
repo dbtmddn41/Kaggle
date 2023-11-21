@@ -5,9 +5,6 @@ params:
   kernel_sizes:
     - 32
     - 16
-    - 4
-  strides:
-    - 1
-    - 1
-    - ${downsample_rate}
+    - 4 #3개만 해야 keras_sm에서 오류 안 남
+  strides: ${downsample_rate}
   pooling: False
