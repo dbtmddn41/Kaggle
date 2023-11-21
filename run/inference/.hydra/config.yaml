@@ -1,28 +1,24 @@
 exp_name: run
-wandb:
-  project: sleep state
-  entity: null
-  name: triple 300BCE+Focal
-epochs: 30
-finetune: 0
-metric:
-  AP_threshold: 0.0
+series_parquet: test.parquet
+event_csv: test_events.csv
+phase: test
 duration: 5760
 downsample_rate: 2
-batch_size: 8
+batch_size: 32
 augmentation:
   mixup_prob: 0.0
-  mixup_alpha: 0.5
+  mixup_alpha: 0.4
   cutmix_prob: 0.0
-  cutmix_alpha: 0.2
+  cutmix_alpha: 0.4
+score_th: 0.02
+distance: 120
 label:
-  offset: 20
+  offset: 10
   sigma: 3
   labels:
   - awake
   - event_onset
   - event_wakeup
-phase: train
 features:
 - anglez
 - enmo
@@ -44,10 +40,8 @@ dir:
   sub_dir: null
   tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
 model:
-  name: triple
-  encoder_name: resnet34
-  encoder_weights: imagenet
-  model_name: triple_CNN_UNetDecoder
+  name: dual
+  model_name: dual_CNN_UNetDecoder
   feature_extractor:
     name: CNN
     params:

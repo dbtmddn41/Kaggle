@@ -5,4 +5,4 @@ defaults:
   - decoder: UNetDecoder
 encoder_name: resnet34
 encoder_weights: imagenet
-model_name: dual_CNN_UNetDecoder
+model_name: triple_CNN_UNetDecoder

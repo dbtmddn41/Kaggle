@@ -113,12 +113,12 @@ hydra:
     - hydra.mode=RUN
     task: []
   job:
-    name: train
+    name: inference
     chdir: true
     override_dirname: ''
     id: ???
     num: ???
-    config_name: train
+    config_name: inference
     env_set: {}
     env_copy: []
     config:
@@ -140,9 +140,9 @@ hydra:
     - path: ''
       schema: structured
       provider: schema
-    output_dir: /home/lyu/AI/CMI/run/train
+    output_dir: /home/lyu/AI/CMI/run/inference
     choices:
-      model: triple
+      model: dual
       model/decoder: UNetDecoder
       model/feature_extractor: CNN
       dir: local

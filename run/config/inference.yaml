@@ -13,19 +13,15 @@ exp_name: run
 defaults:
   - _self_
   - dir: local
+  - model: dual
 
-exp_name: run
+series_parquet: test.parquet
+event_csv: test_events.csv
 phase: test
 
-#model
-model_type: 'single'
-model: 'GRUNet'
-
 #Dataset
-negative_sampling_rate:
 duration: 5760
-downsample_rate:
-upsample_rate:
+downsample_rate: 2
 batch_size: 32
 
 # augmentation
@@ -48,8 +44,33 @@ label:
     - "event_wakeup"
 
 # feature
-features:
+features: 
   - "anglez"
   - "enmo"
+  - "lids"
+  - 'weekday'
+  - 'signal_onset'
+  - 'signal_awake'
+  - 'hour'
+  # - 'enmo_rolling_mean'
+  # - 'enmo_rolling_max'
+  # - 'enmo_rolling_std'
+  # - 'anglez_rolling_mean'
+  # - 'anglez_rolling_max'
+  # - 'anglez_rolling_std'
+  # - 'enmo_prev_diff_rolling_mean'
+  # - 'enmo_prev_diff_rolling_max'
+  # - 'anglez_prev_diff_rolling_mean'
+  # - 'anglez_prev_diff_rolling_max'
+  # - 'anglez_mad'
+  # - 'enmo_mad'
+  - 'anglez_sin'
+  # - 'anglez_cos'
+  # - 'anglez_tan'
+
+  # - "month_sin" 
+  # - "month_cos"
   # - "hour_sin"
   # - "hour_cos"
+  # - "minute_sin"
+  # - "minute_cos"
