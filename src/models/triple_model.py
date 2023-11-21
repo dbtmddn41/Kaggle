@@ -20,6 +20,7 @@ class TripleModel(keras.Model):
         self.feature_extractor_cfg = feature_extractor_cfg
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
+        self.phase = phase
         if phase != 'test':
             self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=encoder_weights, input_shape=(None, None, 3))
         else:
@@ -38,7 +39,8 @@ class TripleModel(keras.Model):
     
     def get_config(self):
         config = super().get_config()
-        config.update({"feature_extractor_cfg": self.feature_extractor_cfg,
+        config.update({'phase': self.phase,
+                       "feature_extractor_cfg": self.feature_extractor_cfg,
                        'decoder_cfg': self.decoder_cfg,
                        'encoder_name': self.encoder_name,
                        'encoder_weights': self.encoder_weights
