@@ -26,7 +26,7 @@ def get_model(cfg: DictConfig):
         model = DualModel(cfg.model.feature_extractor, cfg.model.decoder,
                           (cfg.duration//cfg.downsample_rate, cfg.model.feature_extractor.params.base_filters[-1], len(cfg.model.feature_extractor.params.kernel_sizes)))
     elif cfg.model.name == 'triple':
-        model = TripleModel(cfg.model.feature_extractor, cfg.model.decoder,
+        model = TripleModel(cfg.phase, cfg.model.feature_extractor, cfg.model.decoder,
                           cfg.model.encoder_name, cfg.model.encoder_weights)
     model.build(input_shape=(None, cfg.duration, len(cfg.features)))
     return model

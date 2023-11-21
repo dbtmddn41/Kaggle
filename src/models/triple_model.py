@@ -10,7 +10,7 @@ os.environ["SM_FRAMEWORK"] = "tf.keras"
 import segmentation_models as sm
 
 class TripleModel(keras.Model):
-    def __init__(self, feature_extractor_cfg: DictConfig, decoder_cfg: DictConfig,
+    def __init__(self, phase ,feature_extractor_cfg: DictConfig, decoder_cfg: DictConfig,
                  encoder_name: str, encoder_weights: str):
         super().__init__()
         if not isinstance(feature_extractor_cfg, dict):
@@ -20,7 +20,11 @@ class TripleModel(keras.Model):
         self.feature_extractor_cfg = feature_extractor_cfg
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
-        self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=encoder_weights, input_shape=(None, None, 3))
+        if phase != 'test':
+            self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=encoder_weights, input_shape=(None, None, 3))
+        else:
+            self.encoder = sm.Unet(encoder_name, classes=1, input_shape=(None, None, 3))
+
         self.decoder_cfg = decoder_cfg
         self.feature_extractor = get_feature_extractor(feature_extractor_cfg)
         self.decoder = get_decoder(decoder_cfg)
