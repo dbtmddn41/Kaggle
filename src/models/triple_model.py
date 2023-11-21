@@ -21,7 +21,7 @@ class TripleModel(keras.Model):
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
         # self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=encoder_weights, input_shape=(None, None, 3)) 캐글 인터넷 off
-        self.encoder = sm.Unet(encoder_name, classes=1, input_shape=(None, None, 3))
+        self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=None, input_shape=(None, None, 3))
 
         self.decoder_cfg = decoder_cfg
         self.feature_extractor = get_feature_extractor(feature_extractor_cfg)
