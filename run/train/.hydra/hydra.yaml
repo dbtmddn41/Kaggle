@@ -142,8 +142,8 @@ hydra:
       provider: schema
     output_dir: /home/lyu/AI/CMI/run/train
     choices:
-      model: triple
-      model/decoder: UNetDecoder
+      model: dual
+      model/decoder: GRUDecoder
       model/feature_extractor: CNN
       dir: local
       hydra/env: default

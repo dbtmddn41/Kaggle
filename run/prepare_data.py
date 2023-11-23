@@ -90,7 +90,7 @@ def preprocess_test_data(cfg: DictConfig, series: pd.DataFrame, id_map: dict)\
             data = []
     return
 
-def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
+def preprocess_valid_data_old(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
     -> None:
     series_ids = set(events.id_map.unique())
     series_ids &= set(map(lambda x: id_map[x], cfg.split.valid_series_ids))
@@ -120,6 +120,34 @@ def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
             target = []
     return
 
+def preprocess_valid_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
+    -> None:
+    series_ids = set(events.id_map.unique())
+    series_ids &= set(map(lambda x: id_map[x], cfg.split.valid_series_ids))
+    data = []
+    target = []
+    for series_idx, id in enumerate(tqdm(series_ids)):
+        curr_events = events.query('id_map == @id').reset_index(drop=True).sort_values(by='step')
+        curr_series = series.query('id_map == @id').reset_index().sort_values(by='step')
+        for i in range(len(curr_events)-1):
+            start = curr_events.iloc[i].step
+            start = np.random.randint(max(0, start-cfg.duration), start)
+            end =  min(start+cfg.duration, len(curr_series))
+            series_data = curr_series.loc[start: end-1, cfg.features]
+            if len(series_data) != cfg.duration:
+                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration - len(series_data)), columns=series_data.columns)
+                series_data = pd.concat([series_data, padding_df], ignore_index=True)
+            event_target = curr_events.query('@start < step and step < @end')
+            onsets = (event_target.query('event == 1').step.values - start).astype(np.uint32)
+            wakeups = (event_target.query('event == 2').step.values - start).astype(np.uint32)
+            data.append(series_data)
+            target.append((onsets, wakeups))
+        if series_idx != 0 and (series_idx % 10 == 0 or series_idx == len(series_ids)-1):
+            convert_and_save(cfg, data, target, (series_idx-1)//10)
+            data = []
+            target = []
+    return
+
 def preprocess_train_data(cfg: DictConfig, events: pd.DataFrame, series: pd.DataFrame, id_map: dict)\
     -> None:
     series_ids = set(events.id_map.unique())
@@ -133,8 +161,8 @@ def preprocess_train_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
         for i in range(len(curr_events)-1):
             start, end = max(0, curr_events.iloc[i].step-cfg.duration), min(curr_events.iloc[i].step+cfg.duration, len(curr_series))
             series_data = curr_series.loc[start: end-1, cfg.features]
-            if len(series_data) != cfg.duration * 2:
-                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration * 2 - len(series_data)), columns=series_data.columns)
+            if len(series_data) != cfg.duration:
+                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration - len(series_data)), columns=series_data.columns)
                 series_data = pd.concat([series_data, padding_df], ignore_index=True)
             event_target = curr_events.query('@start < step and step < @end')
             onsets = (event_target.query('event == 1').step.values - start).astype(np.uint32)

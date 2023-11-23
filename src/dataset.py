@@ -48,10 +48,9 @@ def get_dataset(cfg: DictConfig, mode='train') -> None:
         for label_name in ('onset', 'wakeup'):
             example[label_name] = (example[label_name] - start) // cfg.downsample_rate
         label = get_label(example, cfg.duration // cfg.downsample_rate)
-        if mode.startswith('train'):
-            label = gaussian_label(
-                label, offset=cfg.label.offset, sigma=cfg.label.sigma
-            )
+        label = gaussian_label(
+            label, offset=cfg.label.offset // cfg.downsample_rate, sigma=cfg.label.sigma
+        )
 
         return feature, label
     # os.walk(Path(cfg.dir.processed_dir))

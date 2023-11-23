@@ -11,7 +11,7 @@ augmentation:
   cutmix_prob: 0.0
   cutmix_alpha: 0.4
 score_th: 0.02
-distance: 120
+distance: 1
 label:
   offset: 10
   sigma: 3

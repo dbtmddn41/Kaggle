@@ -5,6 +5,8 @@ from tensorflow import keras
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.decoder.UNetDecoder import UNetDecoder
+from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
+from src.models.decoder.TransformerDecoder import TransformerDecoder
 from src.models.feature_extractor.CNN import CNN
 os.environ["SM_FRAMEWORK"] = "tf.keras"
 import segmentation_models as sm
@@ -20,8 +22,8 @@ class TripleModel(keras.Model):
         self.feature_extractor_cfg = feature_extractor_cfg
         self.encoder_name = encoder_name
         self.encoder_weights = encoder_weights
-        # self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=encoder_weights, input_shape=(None, None, 3)) 캐글 인터넷 off
-        self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=None, input_shape=(None, None, 3))
+        self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=encoder_weights, input_shape=(None, None, 3)) #캐글 인터넷 off
+        # self.encoder = sm.Unet(encoder_name, classes=1, encoder_weights=None, input_shape=(None, None, 3))
 
         self.decoder_cfg = decoder_cfg
         self.feature_extractor = get_feature_extractor(feature_extractor_cfg)
@@ -53,4 +55,10 @@ def get_feature_extractor(cfg: dict):
 def get_decoder(cfg: DictConfig):
     if cfg['name'] == 'UNetDecoder':
         decoder = UNetDecoder(cfg['params']['n_classes'], cfg['params']['scale_factor'], cfg['params']['se'], cfg['params']['res'], cfg['params']['dropout'])
+    elif cfg['name'] == 'LSTMDecoder':
+        decoder = LSTMDecoder(cfg['params']['n_classes'], cfg['params']['hidden_size'], cfg['params']['n_layers'], cfg['params']['dropout'])
+    elif cfg['name'] == 'GRUDecoder':
+        decoder = GRUDecoder(cfg['params']['n_classes'], cfg['params']['hidden_size'], cfg['params']['n_layers'], cfg['params']['dropout'])
+    elif cfg['name'] == 'TransformerDecoder':
+        decoder = TransformerDecoder(cfg['params']['n_classes'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['n_layers'], cfg['params']['dropout'])
     return decoder

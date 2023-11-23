@@ -33,7 +33,7 @@ augmentation:
 
 # post_process
 score_th: 0.02
-distance: 120
+distance: 60
 
 label:
   offset: 10

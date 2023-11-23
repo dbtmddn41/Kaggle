@@ -2,7 +2,7 @@ name: triple
 defaults:
   - _self_
   - feature_extractor: CNN
-  - decoder: UNetDecoder
+  - decoder: LSTMDecoder
 encoder_name: resnet34
 encoder_weights: imagenet
-model_name: triple_CNN_UNetDecoder
+model_name: triple_CNN_LSTMDecoder

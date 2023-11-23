@@ -13,17 +13,17 @@ exp_name: run
 defaults:
   - _self_
   - dir: local
-  - model: triple
+  - model: dual
 
 
 wandb:
   project: "sleep state"
   entity:
-  name: "triple 300BCE+Focal"
+  name:
 
 
 #fit
-epochs: 30
+epochs: 60
 finetune: 0
 metric:
  AP_threshold: 0.0
@@ -31,7 +31,7 @@ metric:
 #Dataset
 duration: 5760
 downsample_rate: 2
-batch_size: 8
+batch_size: 32
 
 augmentation:
   mixup_prob: 0.0
@@ -40,7 +40,7 @@ augmentation:
   cutmix_alpha: 0.2
 
 label:
-  offset: 20
+  offset: 100
   sigma: 3
   labels:
     - "awake"
