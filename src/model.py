@@ -6,6 +6,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.GRUNet import GRUNet, EncoderLayer, ResidualBiGRU
+from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
 from src.models.dual_model import DualModel
 from src.models.triple_model import TripleModel
 from src.models.decoder.UNetDecoder import UNetDecoder, Down, SEModule, DoubleConv
@@ -38,10 +39,15 @@ def load_model(cfg: DictConfig):
             custom_objects={"EncoderLayer": EncoderLayer, "ResidualBiGRU": ResidualBiGRU, "EncoderLayer": EncoderLayer, }
             model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.single.name+'.keras', custom_objects=custom_objects)
     elif cfg.model.name == 'dual':
-        custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down}
+        custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down,
+                          'LSTMDecoder': LSTMDecoder, 'GRUDecoder': GRUDecoder
+                          }
         model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', custom_objects=custom_objects)
     elif cfg.model.name == 'triple':
-        custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down,}
+        custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down,
+                          'LSTMDecoder': LSTMDecoder, 'GRUDecoder': GRUDecoder
+                          }
+        model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.m
         model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', custom_objects=custom_objects)
     model.build(input_shape=(None, cfg.duration, len(cfg.features)))
     return model
