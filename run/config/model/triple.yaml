@@ -5,4 +5,4 @@ defaults:
   - decoder: GRUDecoder
 encoder_name: resnet34
 encoder_weights: imagenet
-model_name: triple_SeparableCNN_GRUDecoder
+model_name: triple_DeepSeparableCNN_GRUDecoder

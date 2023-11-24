@@ -111,13 +111,11 @@ hydra:
   overrides:
     hydra:
     - hydra.mode=RUN
-    task:
-    - finetune=1
-    - epochs=10
+    task: []
   job:
     name: train
     chdir: true
-    override_dirname: epochs=10,finetune=1
+    override_dirname: ''
     id: ???
     num: ???
     config_name: train

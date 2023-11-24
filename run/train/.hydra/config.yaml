@@ -3,8 +3,8 @@ wandb:
   project: sleep state
   entity: null
   name: null
-epochs: 10
-finetune: 1
+epochs: 20
+finetune: 0
 metric:
   AP_threshold: 0.0
 duration: 5760
@@ -47,7 +47,7 @@ model:
   name: triple
   encoder_name: resnet34
   encoder_weights: imagenet
-  model_name: triple_SeparableCNN_GRUDecoder
+  model_name: triple_DeepSeparableCNN_GRUDecoder
   feature_extractor:
     name: SeparableCNN
     params:
