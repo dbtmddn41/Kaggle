@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.decoder.UNetDecoder import UNetDecoder
 from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
 from src.models.decoder.TransformerDecoder import TransformerDecoder
-from src.models.feature_extractor.CNN import CNN
+from src.models.feature_extractor.CNN import CNN, SeparableCNN
 
 class DualModel(keras.Model):
     def __init__(self, feature_extractor_cfg: DictConfig, decoder_cfg:DictConfig, feature_shape:tuple[int]):
@@ -40,6 +40,9 @@ class DualModel(keras.Model):
 def get_feature_extractor(cfg: dict):
     if cfg['name'] == 'CNN':
         feature_extractor = CNN(list(cfg['params']['base_filters']), list(cfg['params']['kernel_sizes']), cfg['params']['strides'], cfg['params']['pooling'])
+    if cfg['name'] == 'SeparableCNN':
+        feature_extractor = SeparableCNN(list(cfg['params']['base_filters']), list(cfg['params']['kernel_sizes']), cfg['params']['strides'], cfg['params']['pooling'])
+
     return feature_extractor
 
 def get_decoder(cfg: DictConfig):

@@ -47,9 +47,9 @@ model:
   name: triple
   encoder_name: resnet34
   encoder_weights: imagenet
-  model_name: triple_CNN_GRUDecoder
+  model_name: triple_SeparableCNN_GRUDecoder
   feature_extractor:
-    name: CNN
+    name: SeparableCNN
     params:
       base_filters:
       - 64

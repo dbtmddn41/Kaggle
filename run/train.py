@@ -62,7 +62,7 @@ class CustomLoss(keras.losses.Loss):
         awake_loss = y_true[:, :, 2]*tf.math.log(y_pred[:, :, 2]) + (1 - y_true[:, :, 2])*tf.math.log(1 - y_pred[:, :, 2])
         balanced_bce =  tf.reduce_mean(-onset_loss-wakeup_loss-awake_loss)
         focal_loss_val = self.focal_loss(y_true, y_pred)
-        return balanced_bce + focal_loss_val
+        return balanced_bce + focal_loss_val*0.5
     
     
 if __name__ == '__main__':

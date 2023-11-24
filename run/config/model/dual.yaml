@@ -1,6 +1,6 @@
 name: dual
 defaults:
   - _self_
-  - feature_extractor: CNN
+  - feature_extractor: SeparableCNN
   - decoder: GRUDecoder
-model_name: dual_CNN_GRUDecoder
+model_name: dual_SeparableCNN_GRUDecoder

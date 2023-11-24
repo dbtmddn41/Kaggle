@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.decoder.UNetDecoder import UNetDecoder
 from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
 from src.models.decoder.TransformerDecoder import TransformerDecoder
-from src.models.feature_extractor.CNN import CNN
+from src.models.feature_extractor.CNN import CNN, SeparableCNN
 os.environ["SM_FRAMEWORK"] = "tf.keras"
 import segmentation_models as sm
 
@@ -50,6 +50,9 @@ class TripleModel(keras.Model):
 def get_feature_extractor(cfg: dict):
     if cfg['name'] == 'CNN':
         feature_extractor = CNN(list(cfg['params']['base_filters']), list(cfg['params']['kernel_sizes']), cfg['params']['strides'], cfg['params']['pooling'])
+    if cfg['name'] == 'SeparableCNN':
+        feature_extractor = SeparableCNN(list(cfg['params']['base_filters']), list(cfg['params']['kernel_sizes']), cfg['params']['strides'], cfg['params']['pooling'])
+
     return feature_extractor
 
 def get_decoder(cfg: DictConfig):
