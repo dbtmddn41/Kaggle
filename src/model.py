@@ -40,12 +40,12 @@ def load_model(cfg: DictConfig):
             model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.single.name+'.keras', custom_objects=custom_objects)
     elif cfg.model.name == 'dual':
         custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down,
-                          'LSTMDecoder': LSTMDecoder, 'GRUDecoder': GRUDecoder
+                          'LSTMDecoder': LSTMDecoder, 'GRUDecoder': GRUDecoder,
                           }
         model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', custom_objects=custom_objects)
     elif cfg.model.name == 'triple':
         custom_objects = {'DualModel': DualModel, 'CNN': CNN, 'UNetDecoder': UNetDecoder, 'DoubleConv':DoubleConv, 'SEModule':SEModule, 'Down':Down,
-                          'LSTMDecoder': LSTMDecoder, 'GRUDecoder': GRUDecoder
+                          'LSTMDecoder': LSTMDecoder, 'GRUDecoder': GRUDecoder,
                           }
         model = keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', custom_objects=custom_objects)
     model.build(input_shape=(None, cfg.duration, len(cfg.features)))

@@ -13,7 +13,7 @@ exp_name: run
 defaults:
   - _self_
   - dir: local
-  - model: dual
+  - model: triple
 
 
 wandb:
@@ -23,7 +23,7 @@ wandb:
 
 
 #fit
-epochs: 60
+epochs: 20
 finetune: 0
 metric:
  AP_threshold: 0.0
@@ -31,7 +31,7 @@ metric:
 #Dataset
 duration: 5760
 downsample_rate: 2
-batch_size: 32
+batch_size: 8
 
 augmentation:
   mixup_prob: 0.0

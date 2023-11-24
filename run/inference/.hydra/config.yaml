@@ -41,7 +41,7 @@ dir:
   tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
 model:
   name: dual
-  model_name: dual_CNN_LSTMDecoder_128
+  model_name: dual_CNN_GRUDecoder_256
   feature_extractor:
     name: CNN
     params:
@@ -54,9 +54,9 @@ model:
       strides: ${downsample_rate}
       pooling: false
   decoder:
-    name: LSTMDecoder
+    name: GRUDecoder
     params:
       n_classes: 3
-      hidden_size: 128
+      hidden_size: 256
       n_layers: 2
       dropout: 0.2
