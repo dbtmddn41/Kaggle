@@ -3,8 +3,8 @@ wandb:
   project: sleep state
   entity: null
   name: null
-epochs: 20
-finetune: 0
+epochs: 10
+finetune: 1
 metric:
   AP_threshold: 0.0
 duration: 5760
