@@ -6,7 +6,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.decoder.UNetDecoder import UNetDecoder
 from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
-from src.models.decoder.TransformerDecoder import TransformerDecoder
+from src.models.decoder.TransformerDecoder import TransformerEncoder
 from src.models.feature_extractor.CNN import CNN, SeparableCNN
 
 class DualModel(keras.Model):
@@ -53,5 +53,5 @@ def get_decoder(cfg: DictConfig):
     elif cfg['name'] == 'GRUDecoder':
         decoder = GRUDecoder(cfg['params']['n_classes'], cfg['params']['hidden_size'], cfg['params']['n_layers'], cfg['params']['dropout'])
     elif cfg['name'] == 'TransformerDecoder':
-        decoder = TransformerDecoder(cfg['params']['n_classes'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['n_layers'], cfg['params']['dropout'])
+        decoder = TransformerEncoder(cfg['params']['n_classes'], cfg['params']['n_layers'], cfg['params']['intermediate_dim'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['dropout'])
     return decoder

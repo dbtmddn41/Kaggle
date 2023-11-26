@@ -13,7 +13,7 @@ exp_name: run
 defaults:
   - _self_
   - dir: local
-  - model: triple
+  - model: dual
 
 
 wandb:

@@ -73,7 +73,7 @@ class SeparableCNN(keras.Model):
             ]
             for filters in base_filters[1:]:
                 tmp_block = tmp_block + [
-                    layers.BatchNormalization(axis=1),
+                    layers.BatchNormalization(),
                     layers.ReLU(),
                     layers.SeparableConv1D(filters, kernel_size, 1, 'same')
                 ]

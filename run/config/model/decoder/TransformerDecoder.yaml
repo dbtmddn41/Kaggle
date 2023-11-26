@@ -1,7 +1,7 @@
 name: TransformerDecoder
 params:
   n_classes: 3
-  intermediate_dim: 256
-  num_heads: 4
-  n_layers: 4
+  n_layers: 3
+  intermediate_dim: 48
+  num_heads: 3
   dropout: 0.2
