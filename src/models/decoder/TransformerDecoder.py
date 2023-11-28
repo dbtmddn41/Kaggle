@@ -52,7 +52,7 @@ class TransformerEncoder(layers.Layer):
             block_layers.append(TransformerEncoderBlock(embed_dim, dense_dim, num_heads, dropout_rate))
         self.block_layers = keras.Sequential(block_layers)
         self.dropout = layers.Dropout(dropout_rate)
-        self.fc = layers.Dense(n_classes, activation='sigmoid')
+        self.fc = layers.TimeDistributed(layers.Dense(n_classes, activation='sigmoid'))
 
     def call(self, inputs):
         # pos_inputs = self.pos_embedding(inputs)
