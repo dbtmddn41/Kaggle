@@ -23,15 +23,15 @@ wandb:
 
 
 #fit
-epochs: 20
+epochs: 30
 finetune: 0
 metric:
  AP_threshold: 0.0
 
 #Dataset
-duration: 5760
+duration: 17_280
 downsample_rate: 2
-batch_size: 8
+batch_size: 16
 
 augmentation:
   mixup_prob: 0.0

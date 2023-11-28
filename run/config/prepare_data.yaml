@@ -16,7 +16,7 @@ defaults:
 series_parquet: 'choi_train_series.parquet'
 event_csv: 'train_events.csv'
 phase: train
-duration: 5760
+duration: 17_280
 datatype: feature_engineering
 # feature
 features: 
@@ -49,4 +49,7 @@ features:
   # - "hour_cos"
   # - "minute_sin"
   # - "minute_cos"
+  # - "new_lids"
+  # - 'hour_sin'
+  # - 'hour_sin_prod_enmo'
   

@@ -24,7 +24,7 @@ class CNN(keras.Model):
             ]
             for filters in base_filters[1:]:
                 tmp_block = tmp_block + [
-                    layers.BatchNormalization(axis=1),
+                    layers.BatchNormalization(),
                     layers.ReLU(),
                     layers.Conv1D(filters, kernel_size, 1, 'same')
                 ]

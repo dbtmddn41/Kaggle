@@ -3,13 +3,13 @@ wandb:
   project: sleep state
   entity: null
   name: null
-epochs: 20
+epochs: 30
 finetune: 0
 metric:
   AP_threshold: 0.0
-duration: 5760
+duration: 17280
 downsample_rate: 2
-batch_size: 8
+batch_size: 16
 augmentation:
   mixup_prob: 0.0
   mixup_alpha: 0.5
@@ -45,12 +45,13 @@ dir:
   tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
 model:
   name: dual
-  model_name: dual_SeparableCNN_TransformerDecoder
+  model_name: dual_CNN_GRUDecoder_dur17280
   feature_extractor:
-    name: SeparableCNN
+    name: CNN
     params:
       base_filters:
-      - 16
+      - 64
+      - 128
       kernel_sizes:
       - 64
       - 16
@@ -58,10 +59,9 @@ model:
       strides: ${downsample_rate}
       pooling: false
   decoder:
-    name: TransformerDecoder
+    name: GRUDecoder
     params:
       n_classes: 3
-      n_layers: 3
-      intermediate_dim: 48
-      num_heads: 3
+      hidden_size: 128
+      n_layers: 2
       dropout: 0.2

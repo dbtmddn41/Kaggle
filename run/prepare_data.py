@@ -161,8 +161,8 @@ def preprocess_train_data(cfg: DictConfig, events: pd.DataFrame, series: pd.Data
         for i in range(len(curr_events)-1):
             start, end = max(0, curr_events.iloc[i].step-cfg.duration), min(curr_events.iloc[i].step+cfg.duration, len(curr_series))
             series_data = curr_series.loc[start: end-1, cfg.features]
-            if len(series_data) != cfg.duration:
-                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration - len(series_data)), columns=series_data.columns)
+            if len(series_data) != cfg.duration*2:
+                padding_df = pd.DataFrame([[0] * len(series_data.columns)] * (cfg.duration*2 - len(series_data)), columns=series_data.columns)
                 series_data = pd.concat([series_data, padding_df], ignore_index=True)
             event_target = curr_events.query('@start < step and step < @end')
             onsets = (event_target.query('event == 1').step.values - start).astype(np.uint32)

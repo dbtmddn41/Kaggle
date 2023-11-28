@@ -129,7 +129,7 @@ hydra:
   runtime:
     version: 1.3.2
     version_base: '1.3'
-    cwd: /home/lyu/AI
+    cwd: /home/lyu/AI/CMI
     config_sources:
     - path: hydra.conf
       schema: pkg
@@ -143,8 +143,8 @@ hydra:
     output_dir: /home/lyu/AI/CMI/run/train
     choices:
       model: dual
-      model/decoder: TransformerDecoder
-      model/feature_extractor: SeparableCNN
+      model/decoder: GRUDecoder
+      model/feature_extractor: CNN
       dir: local
       hydra/env: default
       hydra/callbacks: null
