@@ -40,7 +40,7 @@ def main(cfg: DictConfig):
         WandbMetricsLogger(log_freq=5),
         WandbModelCheckpoint("models")
     ]
-    history = model.fit(train_ds, epochs=(cfg.finetune+1)*cfg.epochs, validation_data=validation_ds, #callbacks=callbacks,
+    history = model.fit(train_ds, epochs=(cfg.finetune+1)*cfg.epochs, validation_data=validation_ds, callbacks=callbacks,
                     initial_epoch=cfg.finetune*cfg.epochs)
     best_model = load_model(cfg)# keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras')
     print(best_model.evaluate(train_ds))
