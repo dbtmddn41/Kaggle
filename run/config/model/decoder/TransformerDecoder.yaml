@@ -5,3 +5,4 @@ params:
   intermediate_dim: 384   #len(cnn_filters)*num_cnn
   num_heads: 5
   dropout: 0.2
+  positional_encoding: True
