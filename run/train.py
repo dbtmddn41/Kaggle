@@ -24,7 +24,7 @@ def main(cfg: DictConfig):
     wandb.init(entity=cfg.wandb.entity, project=cfg.wandb.project, name=cfg.wandb.name)
     lr = keras.optimizers.schedules.CosineDecay(initial_learning_rate=0.001, decay_steps=cfg.epochs*232*2, warmup_target=0.003, warmup_steps=100)
     adam = keras.optimizers.Adam(learning_rate=lr)
-    loss = CustomLoss()
+    loss = CustomLoss(reduction=keras.losses.Reduction.NONE)
     
     callbacks = [
         # keras.callbacks.TensorBoard(cfg.dir.tensorboard_logs),
@@ -59,7 +59,7 @@ def main(cfg: DictConfig):
 class CustomLoss(keras.losses.Loss):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.focal_loss = keras.losses.BinaryFocalCrossentropy()
+        self.focal_loss = keras.losses.BinaryFocalCrossentropy(reduction=tf.keras.losses.Reduction.NONE)
     def call(self, y_true, y_pred):
         onset_loss = 300.*y_true[:, :, 0]*tf.math.log(y_pred[:, :, 0]) + 0.1*(1 - y_true[:, :, 0])*tf.math.log(1 - y_pred[:, :, 0])
         wakeup_loss = 300.*y_true[:, :, 1]*tf.math.log(y_pred[:, :, 1]) + 0.1*(1 - y_true[:, :, 1])*tf.math.log(1 - y_pred[:, :, 1])
