@@ -2,7 +2,7 @@ exp_name: run
 series_parquet: choi_train_series.parquet
 event_csv: train_events.csv
 phase: validation
-duration: 17280
+duration: 5760
 datatype: feature_engineering
 features:
 - anglez

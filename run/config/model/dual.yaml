@@ -2,5 +2,5 @@ name: dual
 defaults:
   - _self_
   - feature_extractor: CNN
-  - decoder: GRUDecoder
-model_name: dual_CNN_GRUDecoder_dur17280
+  - decoder: TransformerDecoder
+model_name: dual_CNN_TransformerDecoder_dur17280

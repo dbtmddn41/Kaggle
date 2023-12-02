@@ -16,7 +16,7 @@ defaults:
 series_parquet: 'choi_train_series.parquet'
 event_csv: 'train_events.csv'
 phase: train
-duration: 17_280
+duration: 5760
 datatype: feature_engineering
 # feature
 features: 
