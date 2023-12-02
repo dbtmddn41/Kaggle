@@ -1,7 +1,8 @@
 name: SeparableCNN
 params:
   base_filters: 
-    - 16
+    - 64
+    - 128
   kernel_sizes:
     - 64
     - 16
