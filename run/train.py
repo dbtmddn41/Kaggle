@@ -16,12 +16,7 @@ from wandb.keras import WandbMetricsLogger, WandbModelCheckpoint
 def main(cfg: DictConfig):
     train_ds = get_dataset(cfg, mode='train')
     validation_ds = get_dataset(cfg, mode='validation')
-    if not cfg.finetune:
-        print("create model...")
-        model = get_model(cfg)
-    else:
-        print("load model...")
-        model = load_model(cfg)
+    
     # callbacks = [ToggleMetrics()]
     wandb.config = OmegaConf.to_container(
         cfg, resolve=True, throw_on_missing=True
@@ -30,8 +25,7 @@ def main(cfg: DictConfig):
     lr = keras.optimizers.schedules.CosineDecay(initial_learning_rate=0.001, decay_steps=cfg.epochs*232*2, warmup_target=0.003, warmup_steps=100)
     adam = keras.optimizers.Adam(learning_rate=lr)
     loss = CustomLoss()
-    model.compile(optimizer='adam', loss=loss, metrics=[AveragePrecision(0.0)])
-    print(model.summary())
+    
     callbacks = [
         # keras.callbacks.TensorBoard(cfg.dir.tensorboard_logs),
         keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.x', monitor='val_average_precision', save_best_only=True, mode='max'),
@@ -40,8 +34,18 @@ def main(cfg: DictConfig):
         WandbMetricsLogger(log_freq=5),
         WandbModelCheckpoint("models")
     ]
-    history = model.fit(train_ds, epochs=(cfg.finetune+1)*cfg.epochs, validation_data=validation_ds, callbacks=callbacks,
-                    initial_epoch=cfg.finetune*cfg.epochs)
+    strategy = tf.distribute.MirroredStrategy()
+    with strategy.scope():
+        if not cfg.finetune:
+            print("create model...")
+            model = get_model(cfg)
+        else:
+            print("load model...")
+            model = load_model(cfg)
+        model.compile(optimizer='adam', loss=loss, metrics=[AveragePrecision(0.0)])
+        print(model.summary())
+        history = model.fit(train_ds, epochs=(cfg.finetune+1)*cfg.epochs, validation_data=validation_ds, callbacks=callbacks,
+                        initial_epoch=cfg.finetune*cfg.epochs)
     best_model = load_model(cfg)# keras.models.load_model(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras')
     print(best_model.evaluate(train_ds))
     preds = best_model.predict(validation_ds)

@@ -48,6 +48,7 @@ label:
     - "event_wakeup"
 
 phase: train
+multi_gpu: False
 
 # feature
 features: 
