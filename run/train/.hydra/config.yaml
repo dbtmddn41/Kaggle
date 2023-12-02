@@ -23,7 +23,6 @@ label:
   - event_onset
   - event_wakeup
 phase: train
-multi_gpu: false
 features:
 - anglez
 - enmo

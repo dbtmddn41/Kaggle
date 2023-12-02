@@ -47,8 +47,9 @@ label:
     - "event_onset"
     - "event_wakeup"
 
+loss: mixed
+
 phase: train
-multi_gpu: False
 
 # feature
 features: 

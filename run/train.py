@@ -24,11 +24,14 @@ def main(cfg: DictConfig):
     wandb.init(entity=cfg.wandb.entity, project=cfg.wandb.project, name=cfg.wandb.name)
     lr = keras.optimizers.schedules.CosineDecay(initial_learning_rate=0.001, decay_steps=cfg.epochs*232*2, warmup_target=0.003, warmup_steps=100)
     adam = keras.optimizers.Adam(learning_rate=lr)
-    loss = CustomLoss(reduction=keras.losses.Reduction.NONE)
+    if cfg.loss == 'mixed':
+        loss = CustomLoss(reduction=keras.losses.Reduction.NONE)   #self.focal_loss = keras.losses.BinaryFocalCrossentropy()
+    elif cfg.loss == 'focal':
+        loss = keras.losses.BinaryFocalCrossentropy()
     
     callbacks = [
         # keras.callbacks.TensorBoard(cfg.dir.tensorboard_logs),
-        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.x', monitor='val_average_precision', save_best_only=True, mode='max'),
+        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.h5', monitor='val_average_precision', save_best_only=True, mode='max'),
         # keras.callbacks.EarlyStopping('val_average_precision', patience=6, start_from_epoch=10),
         keras.callbacks.ReduceLROnPlateau(monitor="loss", factor=0.6, patience=2),
         WandbMetricsLogger(log_freq=5),
