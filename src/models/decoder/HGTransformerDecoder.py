@@ -71,7 +71,7 @@ class Up(keras.Model):
         return x
     
 
-class HGTransformerEncoder(layers.Layer):
+class HGTransformerDecoder(layers.Layer):
     def __init__(self, model_name, hidden_dim, down_nums, dropout_rate, n_classes, **kwargs):
         super().__init__(**kwargs)
         self.model_name = model_name
