@@ -86,7 +86,7 @@ class HGTransformerEncoder(layers.Layer):
         self.upsample_blocks = []
         for i in range(down_nums-1,-1,-1):
           self.downsample_blocks.append(Down(hidden_dim//(2**i), scale_factor=2))
-          self.upsample_blocks.append(Up(hidden_dim//(4**(down_nums-i-1)), hidden_dim//(4**(down_nums-i)), bilinear=False, scale_factor=2)
+          self.upsample_blocks.append(Up(hidden_dim//(4**(down_nums-i-1)), hidden_dim//(4**(down_nums-i)), bilinear=False, scale_factor=2))
         self.downsample_blocks = keras.Sequential(self.downsample_blocks)     
         self.upsample_blocks = keras.Sequential(self.upsample_blocks)     
         self.dropout = layers.Dropout(dropout_rate)
