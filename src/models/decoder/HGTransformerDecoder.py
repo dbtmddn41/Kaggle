@@ -86,7 +86,7 @@ class HGTransformerDecoder(layers.Layer):
         self.upsample_blocks = []
         for i in range(down_nums-1,-1,-1):
           self.downsample_blocks.append(Down(hidden_dim//(2**i), scale_factor=2))
-          print(hidden_dim//(2**i))
+          print(hidden_dim, 2**i, hidden_dim//(2**i))
           self.upsample_blocks.append(Up(hidden_dim//(4**(down_nums-i-1)), hidden_dim//(4**(down_nums-i)), bilinear=False, scale_factor=2))
         self.downsample_blocks = keras.Sequential(self.downsample_blocks)     
         self.upsample_blocks = keras.Sequential(self.upsample_blocks)     
@@ -94,9 +94,9 @@ class HGTransformerDecoder(layers.Layer):
         self.fc = layers.TimeDistributed(layers.Dense(n_classes, activation='sigmoid'))
 
     def call(self, inputs, attention_mask=None):
-        if attention_mask is None:
-            attention_mask = tf.fill(dims=tf.shape(inputs), value=1)
         x = self.downsample_blocks(inputs)
+        if attention_mask is None:
+            attention_mask = tf.fill(dims=tf.shape(x), value=1)
         x = self.decoder(x, attention_mask)[0]
         x = self.upsample_blocks(x)
         outputs = self.fc(self.dropout(x))
