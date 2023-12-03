@@ -112,7 +112,7 @@ def gaussian_label(label: tf.Tensor, offset: int, sigma: int) -> tf.Tensor:
     num_events = 2
     rv = stats.norm(0,sigma)
     x = np.arange(-offset, offset+1)
-    gaussian_kernel = rv.pdf(x)
+    gaussian_kernel = rv.pdf(x)*2.5*sigma    #피크가 1이 되도록
     gaussian = tf_convolve(label[:, :num_events], gaussian_kernel)
 
     res = tf.concat([gaussian, label[:, num_events:]], axis=1)
