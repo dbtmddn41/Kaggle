@@ -1,4 +1,4 @@
-name: TransformerDecoder
+name: RelativeTransformerDecoder
 params:
   n_classes: 3
   n_layers: 5
