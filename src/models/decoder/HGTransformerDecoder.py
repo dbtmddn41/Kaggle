@@ -65,8 +65,7 @@ class Up(keras.Model):
             self.conv = DoubleConv(out_channels)
         self.norm = layers.LayerNormalization()
     def call(self, inputs):
-        x = tf.expand_dims(inputs, -1)
-        x = tf.squeeze(self.up(x))
+        x = self.up(inputs)
         x = self.conv(x)
         x = self.norm(x)
         return x
