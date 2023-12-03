@@ -48,7 +48,7 @@ class RelativeTransformerEncoder(layers.Layer):
         self.pos_embedding = tfm.nlp.layers.RelativePositionEmbedding(embed_dim)
         block_layers = []
         for i in range(num_blocks):
-            block_layers.append(TransformerEncoderBlock(embed_dim, dense_dim, num_heads, dropout_rate))
+            block_layers.append(RelativeTransformerEncoderBlock(embed_dim, dense_dim, num_heads, dropout_rate))
         self.block_layers = keras.Sequential(block_layers)
         self.dropout = layers.Dropout(dropout_rate)
         self.fc = layers.TimeDistributed(layers.Dense(n_classes, activation='sigmoid'))
