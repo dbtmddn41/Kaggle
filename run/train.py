@@ -9,7 +9,6 @@ from omegaconf import DictConfig, OmegaConf
 import tensorflow as tf
 import numpy as np
 from tensorflow import keras
-import tensorflow_probability as tfp
 import wandb
 from wandb.keras import WandbMetricsLogger, WandbModelCheckpoint
 
@@ -38,7 +37,7 @@ def main(cfg: DictConfig):
         WandbMetricsLogger(log_freq=5),
         WandbModelCheckpoint("models")
     ]
-    strategy = tfp.distributions.MirroredStrategy()
+    strategy = tf.distributions.MirroredStrategy()
     
     with strategy.scope():
         if not cfg.finetune:
