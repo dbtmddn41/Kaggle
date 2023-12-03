@@ -7,6 +7,8 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.decoder.UNetDecoder import UNetDecoder
 from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
 from src.models.decoder.TransformerDecoder import TransformerEncoder
+from src.models.decoder.RelativeTransformerDecoder import RelativeTransformerEncoder
+from src.models.decoder.HGTransformerDecoder import HGTransformerDecoder
 from src.models.feature_extractor.CNN import CNN, SeparableCNN
 
 class DualModel(keras.Model):
@@ -54,4 +56,9 @@ def get_decoder(cfg: DictConfig):
         decoder = GRUDecoder(cfg['params']['n_classes'], cfg['params']['hidden_size'], cfg['params']['n_layers'], cfg['params']['dropout'])
     elif cfg['name'] == 'TransformerDecoder':
         decoder = TransformerEncoder(cfg['params']['n_classes'], cfg['params']['n_layers'], cfg['params']['intermediate_dim'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['dropout'])
+    elif cfg['name'] == 'RelativeTransformerDecoder':
+        decoder = TransformerEncoder(cfg['params']['n_classes'], cfg['params']['n_layers'], cfg['params']['intermediate_dim'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['dropout'])
+    elif cfg['name'] == 'HGTransformerDecoder':
+        decoder = HGTransformerDecoder(cfg['params']['model_name'], cfg['params']['intermediate_dim'], cfg['params']['down_nums'], cfg['params']['dropout'], cfg['params']['n_classes'])
+   
     return decoder
