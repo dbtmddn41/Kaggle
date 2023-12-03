@@ -1,0 +1,7 @@
+name: HGTransformerDecoder
+params:
+  model_name: "microsoft/deberta-v3-base"
+  intermediate_dim: 768 #not a choice. default of DeBerta.
+  down_nums: 2
+  dropout: 0.2
+  n_classes: 3
