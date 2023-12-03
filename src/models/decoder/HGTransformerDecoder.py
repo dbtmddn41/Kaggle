@@ -96,7 +96,9 @@ class HGTransformerDecoder(layers.Layer):
         x = self.downsample_blocks(inputs)
         if attention_mask is None:
             attention_mask = tf.fill(dims=tf.shape(x)[:-1], value=1)
+        x_shape = tf.shape(x)
         x = self.decoder(x, attention_mask)['last_hidden_state']
+        x = tf.reshape(x, x_shape)
         x = self.upsample_blocks(x)
         outputs = self.fc(self.dropout(x))
         return outputs
