@@ -57,7 +57,7 @@ def get_decoder(cfg: DictConfig):
     elif cfg['name'] == 'TransformerDecoder':
         decoder = TransformerEncoder(cfg['params']['n_classes'], cfg['params']['n_layers'], cfg['params']['intermediate_dim'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['dropout'])
     elif cfg['name'] == 'RelativeTransformerDecoder':
-        decoder = TransformerEncoder(cfg['params']['n_classes'], cfg['params']['n_layers'], cfg['params']['intermediate_dim'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['dropout'])
+        decoder = RelativeTransformerEncoder(cfg['params']['n_classes'], cfg['params']['n_layers'], cfg['params']['intermediate_dim'], cfg['params']['intermediate_dim'], cfg['params']['num_heads'], cfg['params']['dropout'])
     elif cfg['name'] == 'HGTransformerDecoder':
         decoder = HGTransformerDecoder(cfg['params']['model_name'], cfg['params']['intermediate_dim'], cfg['params']['down_nums'], cfg['params']['dropout'], cfg['params']['n_classes'])
    
