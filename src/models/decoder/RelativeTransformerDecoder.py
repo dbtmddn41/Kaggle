@@ -3,7 +3,7 @@ import tensorflow_models as tfm
 from tensorflow import keras
 from keras import layers
 
-class TransformerEncoderBlock(layers.Layer):
+class RelativeTransformerEncoderBlock(layers.Layer):
     def __init__(self, embed_dim, dense_dim, num_heads, dropout_rate=0.0, **kwargs):
         super().__init__(**kwargs)
         self.embed_dim = embed_dim
@@ -35,7 +35,7 @@ class TransformerEncoderBlock(layers.Layer):
         config.update({"embed_dim": self.embed_dim, "dense_dim": self.dense_dim, "num_heads": self.num_heads, 'dropout_rate': self.dropout_rate})
         return config
     
-class TransformerEncoder(layers.Layer):
+class RelativeTransformerEncoder(layers.Layer):
     def __init__(self, n_classes, num_blocks, embed_dim, dense_dim, num_heads, dropout_rate=0.0, **kwargs):
         super().__init__(**kwargs)
         self.num_blocks = num_blocks
