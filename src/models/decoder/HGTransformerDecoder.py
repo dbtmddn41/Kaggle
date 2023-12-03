@@ -1,7 +1,7 @@
 import tensorflow as tf 
 from tensorflow import keras
 from keras import layers
-from transformers import AutoModel
+from transformers import TFAutoModel
 
 class DoubleConv(keras.Model):
     """(convolution => [BN] => ReLU) * 2"""
