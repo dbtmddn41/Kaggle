@@ -8,7 +8,6 @@ class AveragePrecision(keras.metrics.Metric):
         self.threshold = threshold
 
     def update_state(self, y_true, y_pred, sample_weight=None):
-        num_tp = tf.cast(tf.reduce_sum(y_true), tf.int32)
         y_true = tf.squeeze(y_true[: ,:, :2])
         y_pred = tf.squeeze(y_pred[: ,:, :2])
         if self.threshold > 0.:
