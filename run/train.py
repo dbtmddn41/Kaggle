@@ -37,8 +37,7 @@ def main(cfg: DictConfig):
         WandbMetricsLogger(log_freq=5),
         WandbModelCheckpoint("models")
     ]
-    strategy = tf.distributions.MirroredStrategy()
-    
+    strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
         if not cfg.finetune:
             print("create model...")
