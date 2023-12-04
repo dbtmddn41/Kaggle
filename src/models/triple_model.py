@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from src.models.decoder.UNetDecoder import UNetDecoder
 from src.models.decoder.RNNDecoder import LSTMDecoder, GRUDecoder
 from src.models.decoder.TransformerDecoder import TransformerEncoder
+from src.models.decoder.HGTransformerDecoder import HGTransformerDecoder
 from src.models.feature_extractor.CNN import CNN, SeparableCNN
 os.environ["SM_FRAMEWORK"] = "tf.keras"
 import segmentation_models as sm
