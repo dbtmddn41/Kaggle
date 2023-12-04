@@ -29,9 +29,22 @@ def main(cfg: DictConfig):
     elif cfg.loss == 'focal':
         loss = keras.losses.BinaryFocalCrossentropy()
     
+
+    def save_model_checkpoint(epoch, logs):
+        if logs['val_average_precision'] < save_model_checkpoint.best_val_average_precision:
+            save_model_checkpoint.best_val_loss = logs['val_average_precision']
+            model.save_weights(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.'+cfg.save_extention)
+            print('Model checkpoint saved.')
+
+    save_model_checkpoint.best_val_loss = float('inf')
+
+# Initialize your model here
+
+    callbacks=[]
     callbacks = [
         # keras.callbacks.TensorBoard(cfg.dir.tensorboard_logs),
-        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.'+cfg.save_extention, monitor='val_average_precision', save_best_only=True, mode='max', save_format="tf"),
+        tf.keras.callbacks.LambdaCallback(on_epoch_end=save_model_checkpoint),
+        # keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.'+cfg.save_extention, monitor='val_average_precision', save_best_only=True, mode='max', save_format="tf"),
         # keras.callbacks.EarlyStopping('val_average_precision', patience=6, start_from_epoch=10),
         keras.callbacks.ReduceLROnPlateau(monitor="loss", factor=0.6, patience=2),
         WandbMetricsLogger(log_freq=5),
