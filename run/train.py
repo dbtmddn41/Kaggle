@@ -33,7 +33,7 @@ def main(cfg: DictConfig):
     def save_model_checkpoint(epoch, logs):
         if logs['val_average_precision'] < save_model_checkpoint.best_val_average_precision:
             save_model_checkpoint.best_val_loss = logs['val_average_precision']
-            model.save_weights(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.'+cfg.save_extention)
+            model.save(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.'+cfg.save_extention)
             print('Model checkpoint saved.')
 
     save_model_checkpoint.best_val_average_precision = float('inf')
