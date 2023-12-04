@@ -31,7 +31,7 @@ def main(cfg: DictConfig):
     
     callbacks = [
         # keras.callbacks.TensorBoard(cfg.dir.tensorboard_logs),
-        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.x', monitor='val_average_precision', save_best_only=True, mode='max'),
+        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', monitor='val_average_precision', save_best_only=True, mode='max'),
         # keras.callbacks.EarlyStopping('val_average_precision', patience=6, start_from_epoch=10),
         keras.callbacks.ReduceLROnPlateau(monitor="loss", factor=0.6, patience=2),
         WandbMetricsLogger(log_freq=5),
@@ -64,12 +64,12 @@ class CustomLoss(keras.losses.Loss):
         super().__init__(**kwargs)
         self.focal_loss = keras.losses.BinaryFocalCrossentropy(reduction=tf.keras.losses.Reduction.NONE)
     def call(self, y_true, y_pred):
-        onset_loss = 300.*y_true[:, :, 0]*tf.math.log(y_pred[:, :, 0]) + 0.1*(1 - y_true[:, :, 0])*tf.math.log(1 - y_pred[:, :, 0])
-        wakeup_loss = 300.*y_true[:, :, 1]*tf.math.log(y_pred[:, :, 1]) + 0.1*(1 - y_true[:, :, 1])*tf.math.log(1 - y_pred[:, :, 1])
+        onset_loss = 2.*y_true[:, :, 0]*tf.math.log(y_pred[:, :, 0]) + (1 - y_true[:, :, 0])*tf.math.log(1 - y_pred[:, :, 0])
+        wakeup_loss = 2.*y_true[:, :, 1]*tf.math.log(y_pred[:, :, 1]) + (1 - y_true[:, :, 1])*tf.math.log(1 - y_pred[:, :, 1])
         awake_loss = y_true[:, :, 2]*tf.math.log(y_pred[:, :, 2]) + (1 - y_true[:, :, 2])*tf.math.log(1 - y_pred[:, :, 2])
         balanced_bce =  tf.reduce_mean(-onset_loss-wakeup_loss-awake_loss)
         focal_loss_val = self.focal_loss(y_true, y_pred)
-        return balanced_bce + focal_loss_val*0.5
+        return balanced_bce + focal_loss_val
     
     
 if __name__ == '__main__':

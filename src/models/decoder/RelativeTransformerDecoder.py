@@ -12,6 +12,8 @@ class RelativeTransformerEncoderBlock(layers.Layer):
         self.dropout_rate = dropout_rate
 
         self.attention = tfm.nlp.layers.MultiHeadRelativeAttention(num_heads=num_heads, key_dim=embed_dim, dropout=self.dropout_rate)
+        self.content_attention_bias = tf.Variable(initial_value=tf.zeros(num_heads, embed_dim))
+        self.positional_attention_bias = tf.Variable(initial_value=tf.zeros(num_heads, embed_dim))
         self.dense_proj = keras.Sequential([layers.Dense(dense_dim, activation='relu'), layers.Dense(embed_dim)])
         self.dropout1 = layers.Dropout(dropout_rate)
         self.dropout2 = layers.Dropout(dropout_rate)
@@ -21,7 +23,8 @@ class RelativeTransformerEncoderBlock(layers.Layer):
     def call(self, inputs, mask=None):
         if mask is not None:
             mask = mask[:, tf.newaxis, :]
-        attention_output = self.attention(query=inputs, value=inputs, attention_mask=mask)
+        attention_output = self.attention(query=inputs, value=inputs, attention_mask=mask,
+                                          content_attention_bias=self.content_attention_bias, positional_attention_bias=self.positional_attention_bias)
         x = inputs + self.dropout1(attention_output)
         x = self.layernorm_1(x)
         proj_output = self.dense_proj(x)

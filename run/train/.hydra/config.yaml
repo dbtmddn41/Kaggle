@@ -3,13 +3,13 @@ wandb:
   project: sleep state
   entity: null
   name: null
-epochs: 1
+epochs: 30
 finetune: 0
 metric:
   AP_threshold: 0.0
 duration: 5760
 downsample_rate: 2
-batch_size: 32
+batch_size: 8
 augmentation:
   mixup_prob: 0.0
   mixup_alpha: 0.5
@@ -22,6 +22,7 @@ label:
   - awake
   - event_onset
   - event_wakeup
+loss: mixed
 phase: train
 features:
 - anglez
@@ -44,10 +45,12 @@ dir:
   sub_dir: null
   tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
 model:
-  name: dual
-  model_name: dual_CNN_GRUDecoder_ckpt
+  name: triple
+  encoder_name: resnet34
+  encoder_weights: imagenet
+  model_name: triple_DeepSeparableCNN_GRUDecoder
   feature_extractor:
-    name: CNN
+    name: SeparableCNN
     params:
       base_filters:
       - 64
