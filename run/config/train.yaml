@@ -48,10 +48,11 @@ label:
     - "event_wakeup"
 
 loss: focal
-
+save_extention: keras
 phase: train
 
 # feature
+
 features: 
   - "anglez"
   - "enmo"

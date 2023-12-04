@@ -31,7 +31,7 @@ def main(cfg: DictConfig):
     
     callbacks = [
         # keras.callbacks.TensorBoard(cfg.dir.tensorboard_logs),
-        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.keras', monitor='val_average_precision', save_best_only=True, mode='max'),
+        keras.callbacks.ModelCheckpoint(cfg.dir.model_save_dir+'/'+cfg.model.model_name+cfg.save_extention, monitor='val_average_precision', save_best_only=True, mode='max'),
         # keras.callbacks.EarlyStopping('val_average_precision', patience=6, start_from_epoch=10),
         keras.callbacks.ReduceLROnPlateau(monitor="loss", factor=0.6, patience=2),
         WandbMetricsLogger(log_freq=5),
