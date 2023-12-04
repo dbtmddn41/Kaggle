@@ -12,8 +12,8 @@ class RelativeTransformerEncoderBlock(layers.Layer):
         self.dropout_rate = dropout_rate
 
         self.attention = tfm.nlp.layers.MultiHeadRelativeAttention(num_heads=num_heads, key_dim=embed_dim, dropout=self.dropout_rate)
-        self.content_attention_bias = tf.Variable(initial_value=tf.zeros(num_heads, embed_dim))
-        self.positional_attention_bias = tf.Variable(initial_value=tf.zeros(num_heads, embed_dim))
+        self.content_attention_bias = tf.Variable(initial_value=tf.zeros((num_heads, embed_dim)))
+        self.positional_attention_bias = tf.Variable(initial_value=tf.zeros((num_heads, embed_dim)))
         self.dense_proj = keras.Sequential([layers.Dense(dense_dim, activation='relu'), layers.Dense(embed_dim)])
         self.dropout1 = layers.Dropout(dropout_rate)
         self.dropout2 = layers.Dropout(dropout_rate)
