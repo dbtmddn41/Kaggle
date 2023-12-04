@@ -111,12 +111,11 @@ hydra:
   overrides:
     hydra:
     - hydra.mode=RUN
-    task:
-    - phase=validation
+    task: []
   job:
     name: prepare_data
     chdir: true
-    override_dirname: phase=validation
+    override_dirname: ''
     id: ???
     num: ???
     config_name: prepare_data

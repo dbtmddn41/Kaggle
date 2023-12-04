@@ -1,18 +1,19 @@
 exp_name: run
-series_parquet: choi_train_series.parquet
+series_parquet: hong_train_series.parquet
 event_csv: train_events.csv
-phase: validation
+phase: train
 duration: 5760
 datatype: feature_engineering
 features:
 - anglez
 - enmo
-- lids
 - weekday
 - signal_onset
 - signal_awake
-- hour
 - anglez_sin
+- new_lids
+- hour_sin
+- hour_sin_prod_enmo
 dir:
   src_dir: /home/lyu/AI/CMI/src
   data_dir: /home/lyu/AI/CMI/data/child-mind-institute-detect-sleep-states
