@@ -144,7 +144,7 @@ hydra:
     choices:
       model: triple
       model/decoder: GRUDecoder
-      model/feature_extractor: SeparableCNN
+      model/feature_extractor: CNN
       dir: local
       hydra/env: default
       hydra/callbacks: null

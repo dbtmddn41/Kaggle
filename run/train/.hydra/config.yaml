@@ -27,12 +27,13 @@ phase: train
 features:
 - anglez
 - enmo
-- lids
 - weekday
 - signal_onset
 - signal_awake
-- hour
 - anglez_sin
+- new_lids
+- hour_sin
+- hour_sin_prod_enmo
 dir:
   src_dir: /home/lyu/AI/CMI/src
   data_dir: /home/lyu/AI/CMI/data/child-mind-institute-detect-sleep-states
@@ -48,9 +49,9 @@ model:
   name: triple
   encoder_name: resnet34
   encoder_weights: imagenet
-  model_name: triple_DeepSeparableCNN_GRUDecoder
+  model_name: triple_CNN_GRUDecoder
   feature_extractor:
-    name: SeparableCNN
+    name: CNN
     params:
       base_filters:
       - 64

@@ -1,8 +1,8 @@
 name: triple
 defaults:
   - _self_
-  - feature_extractor: SeparableCNN
+  - feature_extractor: CNN
   - decoder: GRUDecoder
 encoder_name: resnet34
 encoder_weights: imagenet
-model_name: triple_DeepSeparableCNN_GRUDecoder
+model_name: triple_CNN_GRUDecoder

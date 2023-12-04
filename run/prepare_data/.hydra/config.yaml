@@ -1,7 +1,7 @@
 exp_name: run
 series_parquet: hong_train_series.parquet
 event_csv: train_events.csv
-phase: train
+phase: validation
 duration: 5760
 datatype: feature_engineering
 features:
