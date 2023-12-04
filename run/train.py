@@ -36,7 +36,7 @@ def main(cfg: DictConfig):
             model.save_weights(cfg.dir.model_save_dir+'/'+cfg.model.model_name+'.'+cfg.save_extention)
             print('Model checkpoint saved.')
 
-    save_model_checkpoint.best_val_loss = float('inf')
+    save_model_checkpoint.best_val_average_precision = float('inf')
 
 # Initialize your model here
 
