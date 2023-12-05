@@ -1,3 +1,1 @@
-- model/decoder=GRUDecoder
-- model.model_name=dual_CNN_GRUDecoder_256
-- model.decoder.params.hidden_size=256
+[]

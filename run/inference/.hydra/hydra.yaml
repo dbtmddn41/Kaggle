@@ -111,14 +111,11 @@ hydra:
   overrides:
     hydra:
     - hydra.mode=RUN
-    task:
-    - model/decoder=GRUDecoder
-    - model.model_name=dual_CNN_GRUDecoder_256
-    - model.decoder.params.hidden_size=256
+    task: []
   job:
     name: inference
     chdir: true
-    override_dirname: model.decoder.params.hidden_size=256,model.model_name=dual_CNN_GRUDecoder_256,model/decoder=GRUDecoder
+    override_dirname: ''
     id: ???
     num: ???
     config_name: inference
@@ -145,7 +142,7 @@ hydra:
       provider: schema
     output_dir: /home/lyu/AI/CMI/run/inference
     choices:
-      model: dual
+      model: triple
       model/decoder: GRUDecoder
       model/feature_extractor: CNN
       dir: local

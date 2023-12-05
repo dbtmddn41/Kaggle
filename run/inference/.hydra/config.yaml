@@ -2,9 +2,10 @@ exp_name: run
 series_parquet: test.parquet
 event_csv: test_events.csv
 phase: test
+save_extention: keras
 duration: 5760
 downsample_rate: 2
-batch_size: 32
+batch_size: 8
 augmentation:
   mixup_prob: 0.0
   mixup_alpha: 0.4
@@ -22,12 +23,13 @@ label:
 features:
 - anglez
 - enmo
-- lids
 - weekday
 - signal_onset
 - signal_awake
-- hour
 - anglez_sin
+- new_lids
+- hour_sin
+- hour_sin_prod_enmo
 dir:
   src_dir: /home/lyu/AI/CMI/src
   data_dir: /home/lyu/AI/CMI/data/child-mind-institute-detect-sleep-states
@@ -40,15 +42,18 @@ dir:
   sub_dir: null
   tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
 model:
-  name: dual
-  model_name: dual_CNN_GRUDecoder_256
+  name: triple
+  encoder_name: resnet34
+  encoder_weights: imagenet
+  model_name: triple_CNN_GRUDecoder
   feature_extractor:
     name: CNN
     params:
       base_filters:
       - 64
+      - 128
       kernel_sizes:
-      - 32
+      - 64
       - 16
       - 4
       strides: ${downsample_rate}
@@ -57,6 +62,6 @@ model:
     name: GRUDecoder
     params:
       n_classes: 3
-      hidden_size: 256
+      hidden_size: 128
       n_layers: 2
       dropout: 0.2

@@ -22,7 +22,8 @@ label:
   - awake
   - event_onset
   - event_wakeup
-loss: mixed
+loss: focal
+save_extention: keras
 phase: train
 features:
 - anglez

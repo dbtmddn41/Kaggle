@@ -13,16 +13,16 @@ exp_name: run
 defaults:
   - _self_
   - dir: local
-  - model: dual
+  - model: triple
 
 series_parquet: test.parquet
 event_csv: test_events.csv
 phase: test
-
+save_extention: keras
 #Dataset
 duration: 5760
 downsample_rate: 2
-batch_size: 32
+batch_size: 8
 
 # augmentation
 augmentation:
@@ -47,11 +47,11 @@ label:
 features: 
   - "anglez"
   - "enmo"
-  - "lids"
+  # - "lids"
   - 'weekday'
   - 'signal_onset'
   - 'signal_awake'
-  - 'hour'
+  # - 'hour'
   # - 'enmo_rolling_mean'
   # - 'enmo_rolling_max'
   # - 'enmo_rolling_std'
@@ -74,3 +74,6 @@ features:
   # - "hour_cos"
   # - "minute_sin"
   # - "minute_cos"
+  - "new_lids"
+  - 'hour_sin'
+  - 'hour_sin_prod_enmo'
