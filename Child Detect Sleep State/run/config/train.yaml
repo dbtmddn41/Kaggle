@@ -1,0 +1,88 @@
+# ---------- Overriding hydra default configs ----------
+hydra:
+  job:
+    name: train
+    chdir: true
+  run:
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
+  sweep:
+    dir: ${dir.output_dir}/${exp_name}/${hydra.job.name}
+    subdir: run${hydra.job.num}
+
+exp_name: run
+defaults:
+  - _self_
+  - dir: local
+  - model: triple
+
+
+wandb:
+  project: "sleep state"
+  entity:
+  name:
+
+
+#fit
+epochs: 30
+finetune: 0
+metric:
+ AP_threshold: 0.0
+
+#Dataset
+duration: 5760
+downsample_rate: 2
+batch_size: 8
+
+augmentation:
+  mixup_prob: 0.0
+  mixup_alpha: 0.5
+  cutmix_prob: 0.0
+  cutmix_alpha: 0.2
+
+label:
+  offset: 100
+  sigma: 3
+  labels:
+    - "awake"
+    - "event_onset"
+    - "event_wakeup"
+
+loss: focal
+save_extention: keras
+phase: train
+
+# feature
+
+features: 
+  - "anglez"
+  - "enmo"
+  # - "lids"
+  - 'weekday'
+  - 'signal_onset'
+  - 'signal_awake'
+  # - 'hour'
+  # - 'enmo_rolling_mean'
+  # - 'enmo_rolling_max'
+  # - 'enmo_rolling_std'
+  # - 'anglez_rolling_mean'
+  # - 'anglez_rolling_max'
+  # - 'anglez_rolling_std'
+  # - 'enmo_prev_diff_rolling_mean'
+  # - 'enmo_prev_diff_rolling_max'
+  # - 'anglez_prev_diff_rolling_mean'
+  # - 'anglez_prev_diff_rolling_max'
+  # - 'anglez_mad'
+  # - 'enmo_mad'
+  - 'anglez_sin'
+  # - 'anglez_cos'
+  # - 'anglez_tan'
+
+  # - "month_sin" 
+  # - "month_cos"
+  # - "hour_sin"
+  # - "hour_cos"
+  # - "minute_sin"
+  # - "minute_cos"
+  - "new_lids"
+  - 'hour_sin'
+  - 'hour_sin_prod_enmo'

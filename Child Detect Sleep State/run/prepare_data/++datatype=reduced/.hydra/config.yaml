@@ -1,0 +1,13 @@
+phase: train
+duration: 5760
+datatype: reduced
+features:
+- anglez
+- enmo
+dir:
+  data_dir: /home/lyu/AI/CMI/child-mind-institute-detect-sleep-states
+  reduced_data_dir: /home/lyu/AI/CMI/detect-sleep-states-memory-decrease
+  processed_dir: null
+  output_dir: null
+  model_dir: null
+  sub_dir: ./

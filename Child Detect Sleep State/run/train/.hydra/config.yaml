@@ -1,0 +1,72 @@
+exp_name: run
+wandb:
+  project: sleep state
+  entity: null
+  name: null
+epochs: 30
+finetune: 0
+metric:
+  AP_threshold: 0.0
+duration: 5760
+downsample_rate: 2
+batch_size: 8
+augmentation:
+  mixup_prob: 0.0
+  mixup_alpha: 0.5
+  cutmix_prob: 0.0
+  cutmix_alpha: 0.2
+label:
+  offset: 100
+  sigma: 3
+  labels:
+  - awake
+  - event_onset
+  - event_wakeup
+loss: focal
+save_extention: keras
+phase: train
+features:
+- anglez
+- enmo
+- weekday
+- signal_onset
+- signal_awake
+- anglez_sin
+- new_lids
+- hour_sin
+- hour_sin_prod_enmo
+dir:
+  src_dir: /home/lyu/AI/CMI/src
+  data_dir: /home/lyu/AI/CMI/data/child-mind-institute-detect-sleep-states
+  reduced_data_dir: /home/lyu/AI/CMI/data/detect-sleep-states-memory-decrease
+  feature_eng_dir: /home/lyu/AI/CMI/data/feature_engineered
+  processed_dir: /home/lyu/AI/CMI/data/preprocessed_data
+  output_dir: /home/lyu/AI/CMI
+  model_dir: /home/lyu/AI/CMI/src/models
+  model_save_dir: /home/lyu/AI/CMI/src/models/saved_models
+  sub_dir: null
+  tensorboard_logs: /home/lyu/AI/CMI/run/tensorboard_logs
+model:
+  name: triple
+  encoder_name: resnet34
+  encoder_weights: imagenet
+  model_name: triple_CNN_GRUDecoder
+  feature_extractor:
+    name: CNN
+    params:
+      base_filters:
+      - 64
+      - 128
+      kernel_sizes:
+      - 64
+      - 16
+      - 4
+      strides: ${downsample_rate}
+      pooling: false
+  decoder:
+    name: GRUDecoder
+    params:
+      n_classes: 3
+      hidden_size: 128
+      n_layers: 2
+      dropout: 0.2

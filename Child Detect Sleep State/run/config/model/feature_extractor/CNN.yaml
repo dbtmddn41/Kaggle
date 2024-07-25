@@ -1,0 +1,11 @@
+name: CNN
+params:
+  base_filters: 
+    - 64
+    - 128
+  kernel_sizes:
+    - 64
+    - 16
+    - 4 #3개만 해야 keras_sm에서 오류 안 남
+  strides: ${downsample_rate}
+  pooling: False
